@@ -16,7 +16,10 @@
 // textbox); one pane for the STABLES, where its administrative works are
 // visualized. for now the stables are the directory: its files are the
 // personality's memory and identity, its subdirectories the personalities
-// it administers, and the same page waits at each of those paths.
+// it administers, and the same page waits at each of those paths. the
+// stables also hold the RESET: during the Genesis test, once the open
+// conversation has said its verdict (READY or NOT READY), a button appears
+// that asks the paddock to wipe it into the playwright's attempts.
 //
 // override semantics: genes absorb root-down the lineage and every
 // matching handler RUNS, each overwriting petri.html - deepest wins by
@@ -79,6 +82,7 @@ const frame = (content, { title = 'VvilL', styles = {}, wide = false } = {}) => 
     .vvill-stables { order: 2; border-bottom: 0; border-left: 1px solid #000; padding: 0 0 0 16px; margin: 0; }
   }
   .vvill-status { color: #666; font-size: 0.85em; margin: 4px 0; }
+  .vvill-wipe { font: inherit; font-size: 0.85em; border: 1px solid #000; background: #fff; padding: 4px 8px; margin: 8px 0; }
   .convo h3 { font-weight: normal; font-size: 0.85em; color: #666; border-top: 1px solid #ccc; padding-top: 8px; margin: 24px 0 8px; }
   .convo h3 a { color: inherit; }
   .turn { margin: 12px 0; white-space: pre-wrap; overflow-wrap: break-word; line-height: 1.4; }
@@ -128,6 +132,7 @@ ${crumb(cpath)}
 ${listing}
 ${dream}
 <p id="state" class="vvill-status"></p>
+<button type="button" id="wipe" class="vvill-wipe" hidden></button>
 </aside>
 <section class="vvill-thread">
 ${past}
@@ -167,8 +172,14 @@ const THREAD_JS = (cpath) => /* js */ `(() => {
   const path = ${JSON.stringify(cpath)};
   const turns = document.getElementById('turns'), head = document.getElementById('livehead'),
     form = document.getElementById('say'), text = document.getElementById('text'),
-    status = document.getElementById('status'), state = document.getElementById('state');
-  let ws, cur = null, backoff = 500;
+    status = document.getElementById('status'), state = document.getElementById('state'),
+    wipe = document.getElementById('wipe');
+  let ws, cur = null, last = null, backoff = 500, verdict = null, armed = false;
+  // the verdict of a Genesis-test wake, READY or NOT READY, said first; once
+  // the open conversation has one, the reset shows in the stables
+  const judge = (t) => { const m = (t || '').slice(0, 400).match(/\\b(NOT READY|READY)\\b/); return m ? m[1] : null; };
+  const show = (v) => { verdict = v; armed = false; wipe.hidden = !v;
+    if (v) wipe.textContent = 'reset · deposit this ' + v + ' attempt to the playwright'; };
   const say = (m) => { status.textContent = m; };
   const bottom = () => window.scrollTo(0, document.body.scrollHeight);
   const el = (cls, body) => { const d = document.createElement('div');
@@ -180,25 +191,28 @@ const THREAD_JS = (cpath) => /* js */ `(() => {
       case 'paddock':
         if (o.subtype === 'state') { turns.textContent = ''; cur = null;
           for (const t of o.turns) el(t.role, t.text);
+          let v = null; for (const t of o.turns) if (t.role === 'assistant') v = judge(t.text) || v; show(o.open ? v : null);
           head.textContent = 'conversation ' + o.n + (o.open ? '' : ' · begins when you speak');
           state.textContent = (o.live ? 'open' : o.open ? 'interrupted, resumes when you speak' : 'quiet')
             + ' · a silence of ' + Math.round(o.idleMs / 60000) + 'm ends a conversation';
           say(o.live ? 'attached' : ''); }
         if (o.subtype === 'deposit') { say('conversation ' + o.n + ' deposited'); setTimeout(() => location.reload(), 800); }
+        if (o.subtype === 'wipe') { say(o.attempts.length ? 'attempt ' + o.attempts.map(a => a.a).join(', ') + ' deposited to the playwright · the void forgets' : 'nothing to wipe'); setTimeout(() => location.reload(), 1200); }
         if (o.subtype === 'exit') say('the process exited (' + (o.code === null ? o.signal : o.code) + ')');
         if (o.subtype === 'stderr') { console.warn(o.text); say(o.text); }
         break;
       case 'system': if (o.subtype === 'init') say('awake · ' + (o.model || '')); break;
       case 'stream_event': { const ev = o.event;
-        if (ev.type === 'content_block_start' && ev.content_block && ev.content_block.type === 'text') cur = el('assistant', '');
+        if (ev.type === 'content_block_start' && ev.content_block && ev.content_block.type === 'text') cur = last = el('assistant', '');
         if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') {
-          if (!cur) cur = el('assistant', ''); cur.textContent += ev.delta.text; bottom(); }
+          if (!cur) cur = last = el('assistant', ''); cur.textContent += ev.delta.text; bottom(); }
         if (ev.type === 'content_block_stop') cur = null;
         break; }
       case 'assistant':
         for (const p of (o.message && o.message.content) || []) if (p.type === 'tool_use') el('tool', '⚙ ' + p.name + ' ' + brief(p.input));
         break;
-      case 'result': say(o.is_error ? 'error: ' + (o.result || o.subtype || '') : 'ready'); break;
+      case 'result': say(o.is_error ? 'error: ' + (o.result || o.subtype || '') : 'ready');
+        { const v = judge(last && last.textContent); if (v) show(v); } break;
     }
   }
   function connect() {
@@ -216,6 +230,12 @@ const THREAD_JS = (cpath) => /* js */ `(() => {
     el('user', t); ws.send(JSON.stringify({ type: 'user', message: { role: 'user', content: t } }));
     text.value = ''; say('…'); };
   text.onkeydown = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); form.requestSubmit(); } };
+  // the reset: two clicks, no dialog. the second asks the paddock to wipe.
+  wipe.onclick = () => {
+    if (!armed) { armed = true; wipe.textContent = 'sure? the void forgets this conversation · click again';
+      setTimeout(() => { if (armed) show(verdict); }, 6000); return; }
+    if (!ws || ws.readyState !== 1) return;
+    ws.send(JSON.stringify({ type: 'paddock', subtype: 'wipe' })); wipe.hidden = true; say('wiping…'); };
   connect();
 })();`;
 

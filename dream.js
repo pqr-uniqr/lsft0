@@ -30,4 +30,15 @@ function turnsOf(raw) {
   return turns;
 }
 
-module.exports = { turnsOf, brief };
+// the verdicts of a Genesis-test wake: READY or NOT READY, said at the
+// head of an assistant turn, in the order said. every assistant turn is
+// scanned, not only the first: a wake that reads before it judges speaks
+// a line before the verdict. the page scans the same way (VvilL.js, judge).
+const VERDICT = /\b(NOT READY|READY)\b/;
+function verdictsOf(raw) {
+  const out = [];
+  for (const t of turnsOf(raw)) if (t.role === 'assistant') { const m = t.text.slice(0, 400).match(VERDICT); if (m) out.push(m[1]); }
+  return out;
+}
+
+module.exports = { turnsOf, brief, verdictsOf };

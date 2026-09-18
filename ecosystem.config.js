@@ -9,7 +9,12 @@
 //   ws://vostok.local:8881/vvill      the paddock, keyed by personality path
 // PADDOCK_IDLE_MS (default 30 minutes of silence) ends a conversation and
 // deposits it; PADDOCK_ARGS adds flags to every claude process.
+// PADDOCK_ATTEMPTS is the playwright's bin: a conversation wiped during the
+// Genesis test is deposited there as a numbered attempt (see paddock.js).
+const { join } = require('path');
+const { homedir } = require('os');
 const PADDOCK_PORT = 8881;
+const PADDOCK_ATTEMPTS = join(homedir(), 'lsft', 'vvill', 'willow', 'abby', 'attempts');
 
 module.exports = {
   apps: [
@@ -27,7 +32,7 @@ module.exports = {
       cwd: __dirname,
       watch: false,
       autorestart: true,
-      env: { PADDOCK_PORT },
+      env: { PADDOCK_PORT, PADDOCK_ATTEMPTS },
     },
   ],
 };
