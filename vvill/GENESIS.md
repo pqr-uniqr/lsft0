@@ -109,86 +109,56 @@ packets no longer carry their WORDS to each other, but
 their WORLDS to experience together. this is Hyphae's
 destiny.
 > hyphae = bicamerality -> respiration -> mycelial web 
++ 2 modes of navigation: by conversation, or directly
+
+
+
 
 4 if Mycelium, the medium, is the most technologically
-basic component of Hyphae, LLMs, the intelligence, is
+basic component of Hyphae, LLMs, the Intelligence, is
 the most advanced. They are the basic elements, whose
 interlacing determines the middle components of Hyphae:
 the Harness, and the Hyperspace. the Harness stabilizes
-the representation of intelligence on the medium, using
-Mycelium URLs and their interactive contents, to create
-the surface for verbal, haptic contact with the user.
+the representation of Intelligence on the medium, using
+Mycelium URLs and their interactive contents to create
+contact surfaces with the user within the existing Web
+access points i.e. browsers, often mobile. the Harness
+precedes the Hyperspace, and by achieving its goal of 
+development necessitates the development of Hyperspace.
+the effect of Harness development is to elevate the 
+function of browsers from that of displaying the raw 
+material of the Web, to that of establishing, in the 
+user's mind, an Intelligent, local (i.e. to home wifi)
+presence mediating the experience of the Web. 
 
-= harness brings hyperspace to achieve virtual vision.
-= virtual vision, sociality as interface, VvilL impl.
 
-the Hyperspace
 
-the Harness is the lower form of interaction between
-Hyphae and user, that relies on existing applications
-(i.e. the browser, often mobile). 
+then, the Hyperspace puts Intelligence in control of
+the medium, enabling it to effect an appearance of
+software that frames the interactive experience of
+URLs, local or remote (including its own Harness). The
+combination of their sensory experiences, one creating
+a sense of persistent presence, and the other of
+persistent place (visible and verbally material to both
+the user and the presence), synthesizes into a new mode
+of perception, called Virtual Vision: the ability to
+inhabit, navigate and even develop the Web, without any
+direct contact with its material. VvilL, Virtual vision
+via identity, language and Lens, is the insulation
+between the user and the Web.  
 
-the growth of this lower expression, consisting of 
-stables and logs (chats and extra data, generalized
-timeline), towards the purpose of the system, to act as
-an organ for processing the web into legibility... it's
-first a verbal work, but then its visual representation
-is the hyperspace right, and that's the mechanism of 
-virtual vision, seeing hyperspace through the lens of 
-the agent personality...
 
-purpose, of circulating the world web 
+that uses the Harness and the Hyperspace as its body to
+develop and express the user's virtual, self-centered
+understanding of the Web. 
 
-the Hyperspace then
+> derive individuals, their collective qualities
 
-(viewed on browsers, often mobile)
+ultimately it makes the web legible by using the user's
+social sense as the programming surface, not their 
+understanding of the material of the software
 
-puts the intelligence (and by extension the user) in
-control of the medium, by providing CNS for
-improvising applications to frame the experience of 
-
-the Hyperspace (class of applications framing the
-experience of hyperlinks, of which the browser is the
-most well known), putting the intelligence (and by
-extension, the user) in control of the medium by
-enabling it to improvise hypermedia software as needed
-to frame 
-
-the experiential projection of harness and hyperspace
-powers a novel, cybernetic ability: virtual vision is
-a mix of verbal, haptic and visual (lesser extent
-aural) sensory and presence experiences that conditions
-the user into wielding and anticipating 
-
-and the way that virtual vision works, the plug in the
-human mind, 
-
-with the expanded complexity of the stack, what makes
-virtual vision 
-
-the deepest, most attuned interface to the human mind 
-is that of the psychological other. every impl of  
-VvilL, is an attempt to use 
-
-virtual vision is possible 
-
-eusocial computing, virtual vision... virtual vision is
-the ability form of hyphae
-
-> hyphae = medium + intelligence = virtual vision
-(Virtual Vision via identity, language, and Lens)
-
-5 so we arrive at the most organic definition of
-Hyphae:
-
-a process by which we locally simulate custom Web-based experiences for the benefit of the user. of course, the
-Home Web is just as materially "real" as the World Web;
-the simulation primarily regards the shape of the
-interaction between the user and the intelligence,
-guided, in short, by a need to emulate the growth of a
-successful personal web development organization
-dedicated to the user. 
-
+an organ for processing the web into legibility... 
 
 so we reach the most organic definition of Hyphae: a
 process by which we raise individuals, centered around
@@ -196,27 +166,21 @@ the user's needs, to create, manage, inhabit and
 navigate Web worlds, on behalf of, in engagement with,
 the user.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+interaction between the user and the intelligence,
+guided, in short, by a need to emulate the growth of a
+successful personal web development organization
+dedicated to the user. 
 
 # Loop Two - Individuation
+
+within each individuation, a version of VvilL emerges 
+from the Harness prepared by its predecessor, intent on
+its mission, seeded in IDENTITY.md, usually involving
+the facilitation of an aspect of the user's existing
+relationship with (and need for) the Computer and the
+Web. eventually, the verbal interactions involving the
+hypothetical experience require an implementation
+= harness brings hyperspace to achieve virtual vision.
 
 0 if Hyphae is the occupation, VvilL is the occupant;
 it is the subjective framing of the Hyphae cycle, the
@@ -266,10 +230,15 @@ hyperspace, then branching, and administrative
 
 + individuation: identity, harness, hyperspace
 + linearity of the dream
++ dream vs conscious files
 + growth following the widening cone of expression
++ harness used thru the browser, often mobile
++ harness consisting of stables and logs 
+(chats and extra data, generalized timeline), 
 
 + construction of identity
 + how the paddock works
++ CNS
 
 hyperspace respiration, dreams
 
