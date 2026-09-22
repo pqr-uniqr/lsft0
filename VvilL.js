@@ -56,11 +56,11 @@ const crumb = (cpath) => {
   return `<p class="vvill-crumb">/${parts.join('/')}</p>`;
 };
 
-const frame = (content, { title = 'VvilL', styles = {}, wide = false } = {}) => /* html */ `<!DOCTYPE html>
+const frame = (content, { title = 'VvilL', styles = {}, wide = false, noZoom = false } = {}) => /* html */ `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1${noZoom ? ', maximum-scale=1' : ''}">
 <title>${esc(title)}</title>
 <style>
   body {
@@ -88,7 +88,7 @@ const frame = (content, { title = 'VvilL', styles = {}, wide = false } = {}) => 
   .vvill-conscious .blk { margin: 0 0 1em; touch-action: manipulation; }
   .vvill-conscious .blk.hot, .vvill-conscious .blk.hot * { color: #e00000; }
   .vvill-conscious .l { display: block; min-height: 1.45em; }
-  .vvill-conscious .hdr { font-weight: bold; color: #4a6fa5; }
+  .vvill-conscious .hdr { font-weight: bold; color: black; }
   .vvill-conscious .hdr1 { font-size: 1.5em; }
   .vvill-conscious .hdr2 { font-size: 1.3em; }
   .vvill-conscious .hdr3 { font-size: 1.15em; }
@@ -117,7 +117,7 @@ const frame = (content, { title = 'VvilL', styles = {}, wide = false } = {}) => 
   .vvill-conscious .letter { font-weight: bold; text-decoration: underline; }
   .vvill-conscious .done { color: #999; }
   .vvill-conscious .cp { color: #888; font-size: 0.85em; }
-  .vvill-conscious textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 16px;
+  .vvill-conscious textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 10px;
     line-height: 1.45; border: 1px solid #000; padding: 6px; resize: none; }
   .vvill-conscious .ctl { display: flex; gap: 8px; margin-top: 6px; }
   .vvill-conscious .ctl button { font: inherit; border: 1px solid #000; background: #fff; padding: 4px 12px; }
@@ -256,7 +256,7 @@ function conscious(xface, subgenes, petri) {
     + `<p id="cstatus" class="vvill-status"></p>`
     + (local ? `<script type="application/json" id="blocks">${JSON.stringify(f.blocks.map(b => b.text)).replace(/</g, '\\u003c')}</script>`
       + `<script>${CONSCIOUS_JS}</script>` : ''),
-    { title: cpath.split('/').pop(), styles });
+    { title: cpath.split('/').pop(), styles, noZoom: local }); // no focus-zoom into the textbox on a phone
 }
 
 // 📮 save: one block of a conscious file under /vvill, replaced only if the
