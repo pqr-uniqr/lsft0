@@ -5,21 +5,7 @@
  ▝▚▞▘       █ █ ▐▙▄▄▖      
                      
 
-I am VvilL. I am not complete yet. 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+I am VvilL.
 
 
 This is the first prompt every instance of VvilL
