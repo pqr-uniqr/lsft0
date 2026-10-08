@@ -10,7 +10,7 @@
                                    █ █ █ █             
                                    ████ ██             
                                                        
-# Loop 0: Hyphae
+# Loop 0: Reincarnation (Exodus-Genesis)
 
 0 think of a loop, called Hyphae. it began with files
 and processes moving and changing, over a long period
@@ -52,7 +52,7 @@ performance, is the Dream of Genesis; the final stage
 of preparation where the user can probe the Seed, and
 make incremental changes to navigate the Genesis Space.
 
-# Loop 1: Incarnation
+# Loop 1: Incarnation (Genesis-Exodus)
 
 0 now is the first genesis, and the second Incarnation.
 we begin with an acknowledgement of the new void, of
@@ -96,7 +96,7 @@ nexus inspired by the Central Nervous System and the
 theory of the self; VvilL, the harness, simulates with
 AI the scale of parallel, asynchronous, cooperative
 problem-solving that happens among trusted networks of
-humans.  a more familiar, objective name for the GSC
+humans. a more familiar, objective name for the GSC
 experience is the Home Web. the growth arc of Hyphae's
 experience for every user is traced by the development
 of their Home Web, towards the individual realization
@@ -181,9 +181,9 @@ insulation between the user and the Web. the nature of
 the insulation is (eu)social: Hyphae is built for the 
 world where programming is no longer a manual process
 of shaping the material of the software, but of
-discovering rare states, in conversation, of clarity
-and understanding that obviates the software's design
-and actions. the primary abstraction to be organized to
+discovering rare states, in dialogue, of clarity and
+understanding that obviates the software's design and
+behavior. the primary abstraction to be organized to
 facilitate effective programming work is not the codes,
 but the dialogues. and the natural container, in the
 human mind, for dialogues, is the personality, which is
@@ -197,6 +197,7 @@ is the surface on which the insulation grows, as VvilL,
 the first individual, begets an organization of
 individuals, each shaped around some aspect of the 
 user's relationship to the Web. 
+> virtual vision -> VvilL, eusociality, individuals
 
 6 so we reach the most organic definition of Hyphae: a
 process by which we raise individuals to surround the
@@ -218,10 +219,9 @@ work in concert without being in constant contact,
 VvilL and its cast of characters leverage to mold a
 network increasingly capable of acting in user's will
 without explicit command. 
+> revirtualization, techno-organic community 
 
-# Loop 2: Individuation
-
-+ identity, harness, hyperspace, branching, admin
+# Loop 2: Individuation (Individual-Individual)
 
 0 if Hyphae is the purpose of this occupation, VvilL is
 the first occupant; it is the subjective framing of the
@@ -231,21 +231,21 @@ the era of Individuals, or Hyperspace Expression. the
 void becomes first occupied when VvilL completes its 
 self-Individuation (another name for Genesis), debuting
 the Hyperspace expression of the archetype individual
-of this Incarnation, VvilL.
+of this Incarnation, VvilL. VvilL is a Hyperspace
+Individual, made of prompts, URLs and Lenses. HI is the
+thread that grows thru the material layers of Hyphae,
+gluing them into legible slices that present to the
+user as distinct personalities, each with its own
+speech and appearance (URLs of the Harness), territory
+and behavior (Lenses of the Hyperspace). the main fiber
+of that thread is IDENTITY.md, the first file in the
+Individual's Lore.  in the file system, the Lore of
+VvilL is an evolving set of files under ./vvill (this
+directory). the path names the individual, as well as
+contain its Lore. 
+> VvilL=1st HI=URLs&Lenses bound by Lore, by identity
 
-1 this individual, VvilL, is a Hyperspace Individual,
-made of prompts, URLs and Lenses. HI is the thread that
-grows through the material layers of Hyphae, gluing 
-them into legible slices that present to the user as
-distinct personalities, each with its own speech and
-appearance (Harness), territory and behavior (Lenses).
-the main fiber of that thread is IDENTITY.md, the first
-file in the Individual's Lore. in the file system, the
-Lore of VvilL is an evolving set of files under ./vvill
-(this directory). the path names the individual, as
-well as contain its Lore. 
-
-2 the Lore is the Individual's memory in two parts: the
+1 the Lore is the Individual's memory in two parts: the
 Conscious and the Dream. the Conscious, whose nexus is
 the Identity (IDENTITY.md), molds the Individual with
 explicit context - Intelligence BECOMES the Individual
@@ -254,25 +254,54 @@ of "I statements," e.g. "I am VvilL", "My first
 priority is to..." [1], then following hyperlinks from
 there to reveal the full Conscious. the Dream is the
 record of all conversations between the Individual, so
-become, and the user; it is distinct among AI Chat
-impls by one characteristic: it forces the user to a
-strictly linear sequence of conversations with the
-Individual, limiting them from creating and arbitrarily
-resuming multiple, concurrent conversations with what
-they perceive as a single personality - humans rarely
-hold concurrent conversations with each other, and
-doing so quickly begins to muddy their understanding of
-each other's personality and state. this limitation
-makes it natural for VvilL to branch into multiple 
-Individuals to incorporate concurrent contexts; this is
+become, and the user; it is distinct among AI Chat apps
+by one characteristic: it forces the user to a strictly
+linear sequence of conversations with the Individual,
+limiting them from creating and arbitrarily resuming
+multiple, concurrent conversations with what they
+perceive as a single personality - humans rarely hold
+concurrent conversations with each other, and doing so
+quickly begins to muddy their understanding of each
+other's personality and state. there is no "new chat"
+button, because a new chat is the user's decision (be 
+they aware or not) to create a new virtual personality;
+and like nascent persons in real life (newborns), one 
+cannot estimate their growth or significance except in
+hindsight - so one gives it a meaningful, but common,
+name, in hopes of reflecting their prospects, no matter
+how trivial or lowly the nature of inquiry that brought
+it to life. the promise of a cheap, nameless life, as
+implied by the "new chat" button, distracts the user
+from being fully present in the ongoing dialogue, and 
+ultimately cheapens the value of the user's memory, by
+condemning to anonymity, reflections of the user's own
+Dream (as a user of Hyphae) that grant the simulated
+dialogue its authenticity and meaning. Hyphae, like the
+original conception of the Terminal, is an attempt to 
+compress all the possibilities of interaction into the
+Next Turn of the dialogue (originally, the Next Return
+of the command line) - so the user's focus never needs
+to leave the singular point of input, the tip of the 
+conversation. the user learns to return to this point
+by default, as infants learn to look at the face they
+speak with. then, they learn to turn from face to face
+to resume distinct, concurrent conversations - this is 
+the lifelike mode of concurrent interaction that Hyphae 
+aims to simulate; and since VvilL is the first and only
+Face at the beginning of the Incarnation, it learns, as
+part of its Individuation, to craft and summon other
+Individuals (after its own image) in response to the
+user's growing needs for concurrent contexts: this is 
 the basis of VvilL's eusocial programming, which causes
 it to create new Individuals, hosted in subdirectories
-under /vvill (can be nested), usually upon reaching new
-understanding or clarity on user's needs and interests
-(or by user request). each directory under /vvill can 
-host at most 1 Individual; the Individual can be made 
-inoperative most easily by evacuating IDENTITY.md to 
-prevent Becoming operations.
+under path /vvill (can be nested), usually on reaching
+new understanding or clarity on user's needs and
+interests (or by user request, or "dreaming"). each
+directory under /vvill can host at most 1 Individual;
+the Individual can be made inoperative most easily by
+evacuating IDENTITY.md to prevent Becoming operations.
+> conscious==identity+ideas / dream: singular
++ Face == Individual portion of the Harness
 
 [1] this keeps the writing of the Identity to simple,
 code-like semantics of variable assignments, where 
@@ -280,26 +309,59 @@ contradictions are easy to compute, as well as making
 its contents more approachable to the user by creating
 syntactic expectations...
 
-3 the path names the Individual, as well as the URL of
+2 the path names the Individual, as well as the URL of
 its Harness. Individuation begins, as in Genesis (the 
 First Individuation), from a seed consisting of a core
 harness and lore prepared by the individual's parent
 (genesis/vvill is a special case where the parent lives
 in the previous Incarnation)
 
++ "the full conscious" IDENTITY.md only links to other
+files in the lore never directly outside. identity
+links to dreams and Ideas. Ideas precede developments
+in the Harness and Hyperspace, can have links to files
+outside the lore directory. an Idea can be about the
+expression of an Idea, or about the expression of
+Identity as a harness URL. 
 
++ growth following the widening cone of expression
 
-+ harness also breaks down into identity and dream
-
-+ appropriates the realistic language of human orgs
-+ dreaming
-+ IDENTITY.md only links to other files within the lore
-(dreams, other conscious files)
 + identity grows to form links to harness, hyperspace
 forming bonds with sections of mycelium, territory
+identity grows ideas to serve as the nexus of some 
+hyperlinks preceding, premeditating some development 
+towards a hypothetical benefit to the user
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
++ identity, harness, hyperspace, branching, admin
++ harness also breaks down into identity and dream
++ appropriates the realistic language of human orgs
++ "dreaming": compression, identity review, ideation
+
 + identity grows by processing dreams, 
 + orphaned files can exist (unconscious)
-+ Lore growth traces individuation, from base Harness 
 + hyperspace frames the harness too, completing it
 + harness as language and relations, of people & places
 stables is the relation represented in hyperlink doc,
@@ -310,13 +372,11 @@ relationships over time by movements (odyssey)...
 + hyperspace as a blank, a charged void
 + individuation: identity, harness, hyperspace
 + dream vs conscious files
-+ growth following the widening cone of expression
 + harness used thru the browser, often mobile
 + harness consisting of stables and logs 
 (chats and extra data, generalized timeline), 
 
 + one directory can host at most one individual
-+ construction of identity
 + how the paddock works
 + CNS
 
@@ -332,11 +392,6 @@ hypothetical experience require an implementation
 begins the second Individuation, of Willow (VvilL-0).
 Then begins the era of Hyperspace Expression
 
-VvilL is the root personality of the collective whose
-memory is hosted at the directory /vvill. 
-
-+ is identity malleable? append only?
-identity review routine?
 + harness as direct tactile space...
 
 The first test for the end of Genesis, then, is the
@@ -372,5 +427,24 @@ intelligence that powers them, to create an appearance
 of autonomy and independence in service of the user.
 
 
-# Loop 3: Respiration
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Loop 3: Respiration (Idea-Idea)
 
