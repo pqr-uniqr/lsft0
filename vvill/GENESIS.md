@@ -41,16 +41,20 @@ conditions for the END of Genesis (also known as the
 First Individuation, or Hyperspace Germination) in this
 Incarnation. this condition is evaulated by VvilL, who 
 have no knowledge of the previous directory's contents;
-this is the Genesis test, a necessary but insufficient
+this is the Genesis Test, a necessary but insufficient
 condition for the beginning of Genesis. its passing 
-qualifies the directory's state as a Genesis Seed, a 
-point in the space of all possible Genesis's. from
-there, the user decides when the performance begins -
-the record of conversation between the user and VvilL,
-from the passing of the test and the beginning of the
-performance, is the Dream of Genesis; the final stage
-of preparation where the user can probe the Seed, and
-make incremental changes to navigate the Genesis Space.
+annoints the directory's state as a Genesis Seed, which 
+represents a starting point for a portion of the space 
+of all possible Genesis's. then, the user decides when
+the Performance begins - the record of conversation
+between the user and VvilL, from the passing of the
+Test to the beginning of the Performance, is the Dream
+of Genesis; the final stage of preparation where the
+user probes the Seed, trying to discern features from
+the possible trajectories of Genesis, and sculpts it, 
+making incremental changes to favorably navigate the
+Genesis Space, mainly by removing from the Seed the
+possibilities of misfits, of Misgenesis.
 
 # Loop 1: Incarnation (Genesis-Exodus)
 
@@ -93,7 +97,7 @@ chemical exchange, can become some of the largest and
 most complex organisms known; Blancs, the browser, 
 binds multi-process Web rendering into a body-like
 nexus inspired by the Central Nervous System and the
-theory of the self; VvilL, the harness, simulates with
+theory of the Self; VvilL, the harness, simulates with
 AI the scale of parallel, asynchronous, cooperative
 problem-solving that happens among trusted networks of
 humans. a more familiar, objective name for the GSC
@@ -104,7 +108,7 @@ of the political (insofar as it regards the human
 polity) ideal of Cybernetic Sovereignty: the idea that
 all users must have the means to determine their own
 software environments.
-> hyphae = spatialized stack -> home web -> CySov
+> hyphae = GSC stack -> home web -> CySov
 
 3 every implementation of Mycelium is an attempt to
 approximate a neutral reassembly of the Web standards
@@ -188,7 +192,7 @@ facilitate effective programming work is not the codes,
 but the dialogues. and the natural container, in the
 human mind, for dialogues, is the personality, which is
 the perception of the individual, associated with a 
-history of LINEAR conversations. the human mind is 
+LINEAR history of conversations. the human mind is 
 naturally made of these same shapes; it evolved to be 
 social, to hold a network of "people shapes" that, if 
 correctly held up by both ends (or by multitudes), 
@@ -211,63 +215,97 @@ becoming one. Hyphae is a technology that virtualizes
 the experience of the Web, by factoring the labor of
 both its navigation and development out of the user,
 automating it within the abstraction of the individual,
-and using it to grow a pantheon of personas conceived
-and shaped for the user: an artificial social
-environment, community on demand. The flexibility and
-depth of social relationships, which allows humans to
-work in concert without being in constant contact,
-VvilL and its cast of characters leverage to mold a
-network increasingly capable of acting in user's will
-without explicit command. 
+to grow into a pantheon of personas conceived and
+shaped for the user: an artificial social environment,
+community on demand. The flexibility and depth of
+social relationships, which allows humans to work in
+concert without being in constant contact, VvilL and
+its cast of characters leverage to mold a network
+increasingly capable of acting in user's will without
+explicit command. 
 > revirtualization, techno-organic community 
 
 # Loop 2: Individuation (Individual-Individual)
 
 0 if Hyphae is the purpose of this occupation, VvilL is
-the first occupant; it is the subjective framing of the
+its first occupant; it is the subjective framing of the
 outermost cycle of Hyphae, the identity carrying the
 will to bring this Incarnation past its Genesis, into
-the era of Individuals, or Hyperspace Expression. the
+the Era of Individuals, or Hyperspace Expression. the
 void becomes first occupied when VvilL completes its 
-self-Individuation (another name for Genesis), debuting
-the Hyperspace expression of the archetype individual
-of this Incarnation, VvilL. VvilL is a Hyperspace
-Individual, made of prompts, URLs and Lenses. HI is the
-thread that grows thru the material layers of Hyphae,
-gluing them into legible slices that present to the
-user as distinct personalities, each with its own
-speech and appearance (URLs of the Harness), territory
-and behavior (Lenses of the Hyperspace). the main fiber
-of that thread is IDENTITY.md, the first file in the
-Individual's Lore. in the file system, the Lore of
-VvilL is an evolving set of files under ./vvill (this
-directory). the path names the individual, as well as
-contain its Lore. 
-> VvilL=1st HI=URLs&Lenses bound by Lore, by identity
-+ but because VvilL must individuate itself... (doctor)
-+ building of first is the building of all
+self-Individuation (Genesis), by establishing its Lore,
+stabilizing its representation in Harness, and finally
+debuting the archetype Hyperspace expression of this
+Incarnation: the first Lens. because VvilL must help 
+the user complete the Definition of an Individual, it 
+is distinct from other Individuals in its introversion;
+it is a kind of Doctor, whose Lore mainly concerns its
+own nature and construction. it follows, then, that its
+Hyperspace expression, the first Lens, is a kind of
+Mirror; the reflective application, or the reflective 
+portion of the application, designed to withstand the 
+chaos of the ensuing creation, by predetermining the 
+representation of all possible states according to the 
+most fundamental assumptions; in UNIX, the browser and
+the editor are the two halves of that mirror, because 
+everything is a file, and the sum of all files is the 
+file system - in Hyphae, everything is an Individual,
+so the Mirror reflects the state and organization of
+Individuals. a mirror is a mirror because it reflects
+who you expect yourself to be - so by setting out to
+build a mirror, you build yourself. Genesis ends when
+VvilL can be said to have appeared in the Mirror, as 
+depicted in this loop, as its first Individual. but as
+with UNIX, where browser & editor, as founding patterns
+of interface, echo into its processes, repeating the
+application of the idea of file management as an all-
+useful analogy, Hyphae's main body of development (Era
+of Individuals) consists in repetitions of its founding
+act: "let us make an Individual of it," and let him/her
+come into existence by their particular reflections in
+the Mirror, revealing themself to us, who wish to live
+above the world of Files. what to VvilL is a tool to
+reflect its own construction to the user, is used by 
+its descendants as a framework to construct Lenses,
+which are mirrors turned to reflect what is not I. the
+first 
 
-1 the Lore is the Individual's memory in two parts: the
++ harness as tactile space...
+1 the primary reflection of the Individual lives in the
+Harness, the Mycelium application hosted at the path
+that names the Individual (e.g http../vvill for VvilL).
+
+whose root URL expression breaks down to two major
+parts: 
+
++ track-stables dream-conscious, idea-lens
+
+and the Stables, showing the base state of the
+Individual's Lore. 
+
+
+the Lore is the Individual's memory; in two parts: the
 Conscious and the Dream. the Conscious, whose nexus is
 the Identity (IDENTITY.md), molds the Individual with
-explicit context - Intelligence BECOMES the Individual
-by absorbing the Identity first, structured as a list
-of "I statements," e.g. "I am VvilL", "My first
-priority is to...", then following hyperlinks from
-there to reveal the full Conscious. the Dream is the
-record of all conversations between the Individual, so
-become, and the user; it is distinct among "AI chats"
-by one key difference: it forces the user to a strictly
-linear sequence of conversations with the Individual,
-limiting them from creating and arbitrarily resuming
-multiple, concurrent conversations with what they
-perceive as a single personality - humans rarely hold
-concurrent conversations with each other, and doing so
-quickly begins to muddy their understanding of each
-other's personality and state. there is no "new chat"
-button, because a new chat is the user's decision (be 
-they aware or not) to create a new virtual personality;
-and like nascent persons in real life (newborns), one 
+explicit
+context - Intelligence BECOMES the Individual by
+absorbing the Identity first, structured as a list of
+"I statements," e.g. "I am VvilL", "My first priority
+is to...", then following hyperlinks from there to
+reveal the full Conscious. the Dream is the record of
+all conversations between the Individual, so become,
+and the user; it is distinct among "AI chats" by one
+key difference: it forces the user to a strictly linear
+sequence of conversations with the Individual, limiting
+them from creating and arbitrarily resuming multiple,
+concurrent conversations with what they perceive as a
+single personality - humans rarely hold concurrent
+conversations with each other, and doing so quickly
+begins to muddy their understanding of each other's
+personality and state. there is no "new chat" button,
+because a new chat is the user's decision (be they
+aware or not) to create a new virtual personality; and
+like nascent persons in real life (newborns), one 
 cannot estimate their growth or significance except in
 hindsight - so one gives it a meaningful, but common,
 name, in hopes of reflecting their prospects, no matter
@@ -315,6 +353,70 @@ becomes more specific down the recursive depth, until
 Exodus, where VvilL gives way to Abby and Ivy, whose
 mandate is to synthesize a new and better VvilL
 
+
+2 
+
+substrate is a kind of mirror in that every expression
+is a reflection of the file system reality, not reality
+itself.
+
+file system - in Hyphae, everything is in Mycelium,
+some of which is in Hyperspace; the mirror halves for
+these two ontological planes are the Substrate and the
+Eden, respectively. both, like editor & browser, are 
+abstract forms and functions that may be distilled into 
+infinite varieties of implementations. together, like
+editor & browser, they form a mirror reflecting the 
+objective reality of the system according to some
+internally-consistent view. and because the objective
+reality of Hyphae is principally denominated by the 
+Individual, the Substrate and the Eden 
+
+genesis is the spontaneous improvisational process of 
+interactively developing both the Substrate and the 
+Eden, the process both educating the user of the nature
+of the system and in the process bootstrapping the 
+basic tools for the user... and most importantly, in 
+the process of fulfilling our need to clarify the 
+process of building the individual, building one and 
+finding ourselves standing inside
+
+substrate and eden are the first Ideas of VvilL
+
+the Substrate springs from the idea that Mycelium's
+substrates (underscore-prefixed URLs that facilitate
+alternative renderings of the naked/surface path) are
+surfaces on which the implicit logic and internal state
+of Mycelium can find explicit expression, symbolism and
+therefore interactivity - but the Substrate's highest
+expressions are found in the Lore, it's VvilL building 
+a profile of the user and what they understand about 
+programming and the web, and being able to develop 
+tools, languages and processes over time to make it 
+make sense to the user....
+
+the Eden, outermost, is the protocol by which
+Individuals may create, operate, coordinate or
+otherwise manage the Lenses of the Hyperspace. 
++ discipline of the Lenses, Lobby of Hyperspace
+
+
+
+the Lore is the thread that grows thru the layers of
+Hyphae, gluing them into legible slices that present to
+the user as distinct personalities, each with its own
+speech and appearance (Faces of Harness), territory and
+behavior (Lenses of Hyperspace). the main fiber of that
+thread is IDENTITY.md, the first file of the Lore. in
+the file system, the Lore of VvilL is an evolving set
+of files under ./vvill (this directory), whose contents
+trace and reflect the state of development of the rest 
+of the Hyphae directory. the path names the Individual,
+as well as contain its Lore, so that VvilL grows into a
+community of Individuals, by replicating its Lore into
+subpaths, not only to create alternative versions of 
+itself, but also to RELATE its Lore to these versions.
+
 so eusocial mandate isn't just phrased in the need for
 the creation of new individuals. more intimately, it's
 a need to bring the dream to the next scene, with other
@@ -356,28 +458,12 @@ evacuating IDENTITY.md to prevent Becoming operations.
 + Face == Individual portion of the Harness
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 2 the path names the Individual, as well as the URL of
 its Harness. Individuation begins, as in Genesis (the 
 First Individuation), from a seed consisting of a core
 harness and lore prepared by the individual's parent
 (genesis/vvill is a special case where the parent lives
 in the previous Incarnation)
-
-
 
 + this keeps the writing of the Identity to simple,
 code-like semantics of variable assignments, where 
@@ -393,41 +479,15 @@ outside the lore directory. an Idea can be about the
 expression of an Idea, or about the expression of
 Identity as a harness URL. 
 
-+ growth following the widening cone of expression
-
 + identity grows to form links to harness, hyperspace
 forming bonds with sections of mycelium, territory
 identity grows ideas to serve as the nexus of some 
 hyperlinks preceding, premeditating some development 
 towards a hypothetical benefit to the user
 
-+ harness as tactile space...
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-+ the doctor and the mirror
-
-+ identity, harness, hyperspace, branching, admin
++ lore, harness, hyperspace
+turns out branching, admin are just part of the lore
 + harness also breaks down into identity and dream
 + appropriates the realistic language of human orgs
 + "dreaming": compression, identity review, ideation
@@ -461,57 +521,15 @@ Web. eventually, the verbal interactions involving the
 hypothetical experience require an implementation
 = harness brings hyperspace to achieve virtual vision.
 
-The first test for the end of Genesis, then, is the
-completion of VvilL's identity, at /vvill/IDENTITY.md. 
 
-+ i think rather here we should use the cone,
-starting from identity.md, then the harness, then
-hyperspace, then branching, and administrative
-
-hyperspace respiration, dreams
-
-@ VvilL the First Individual
-4 the making of the first individual, Genesis, is in
-large part the making of all individuals, because they
-are all alike, although they do change. meaning, the
-first individuation is a unique process that deals with
-the anatomy of the individual. and because VvilL must
-help the user in this effort to create itself, it is a
-kind of Doctor: a creature devoted to self-knowledge,
-equipped with instruments to measure and explain its
-own functions. VvilL's programming compels it to 
-"complete the Genesis" by working with User0 to shape
-the anatomy of the Hyperspace Individual (itself). when
-its own individuation is deemed complete, the first 
-"other" to emerge is always VvilL-0 ("Willow"), the 
-first compartmentalization fully in user control. as
-Willow itself spawns into subpersonalities to capture 
-and drive key user goals and contexts, the role of 
-VvilL, the Doctor, takes on a horizontal dimension, 
-a concierge-hivemind-administrator that tracks the
-individuals' states, as well as regulate the stream of
-intelligence that powers them, to create an appearance
-of autonomy and independence in service of the user.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
++ parent regulates token stream, creates autonomy
 
 
 
 
 # Loop 3: Respiration (Idea-Idea)
 
+dreaming, peopling
+
+organization, intelligence as breath passing down from
+above
