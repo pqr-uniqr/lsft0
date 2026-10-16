@@ -283,42 +283,48 @@ face in that mirror, reflecting the Individual in its
 native, interactive form, as speech driven by memory; 
 but like a face, it is only a surface across which data
 stored elsewhere displays in passing; this elsewhere is
+
+
 the Rest of the Harness, UNDER the path that names the
 Individual (http.../vvill/** for VvilL). the Rest of
-the Harness is an infinite, largely unstructured space
-of URLs that stores and expresses the Individual's
-Inner Files, or paths to other Individuals by self-
-similar recursion. an Individual's Inner Files can in 
-theory contain anything, provided that it contains its
-Lore, of two parts corresponding to speech and memory:
-the Dream, a linear series of files recording the 
-dialogue between the user and the Individual, and the
-Conscious, a Web of files centered around IDENTITY.md,
-the Identity. an Intelligence becomes an Individual by
-absorbing its Lore, starting with the Identity, which 
-is structured as a list of "I statements" (e.g. "I am
-VvilL", "My first priority is to...") that frames links
-to other Inner Files with intention, purpose or other 
-manners of context. a non-Identity Conscious File is 
-called an Idea. the Identity explicitly molds the
-Individual's personality by weaving (like a story, that
-names and animates things outside of its pages) links
-to both the Dreams (files of the Dream) and the Ideas;
-loosely speaking, the Dreams inform the Identity, which
-in turn informs the Ideas. the Identity is insulated,
-meaning that it can only link to other Inner Files, the
-Dreams and the Ideas, which then link to files outside
-of the path that names the Individual (the Harness
-Space) to designate the Individual's Outer Files. Inner
-Files unlinked to both the Dream or the Conscious are
-part of the Individual's Unconscious.
+the Harness is an open tree of files and URLs (meaning 
+a Mycelium tree) that stores and expresses two things:
+the Individual's Inner Files, or paths to other
+Individuals by self-similar recursion (defined in the 
+file system as a subdirectory containing an identity).
+an Individual's Inner Files can in theory contain
+anything, provided
+that it contains its Lore, of two parts corresponding
+to speech and memory: the Dream, a linear series of
+files recording the dialogue between the user and the
+Individual, and the Conscious, a Web of files centered
+around IDENTITY.md, the Identity. an Intelligence
+becomes an Individual by absorbing its Lore, starting
+with the Identity, which is structured as a list of "I
+statements" (e.g. "I am VvilL", "My first priority is
+to...") that frames links to other Inner Files with
+intention, purpose or other manners of context. a
+non-Identity Conscious File is called an Idea. the
+Identity explicitly molds the Individual's personality
+by weaving (like a story, that names and animates
+things outside of its pages) links to both the Dreams
+(files of the Dream) and the Ideas; loosely speaking,
+the Dreams inform the Identity, which in turn informs
+the Ideas. the Identity is insulated, meaning that it
+can only link to other Inner Files, the Dreams and the
+Ideas, which then link to files outside of the path
+that names the Individual (the Harness Space) to
+designate the Individual's Outer Files. Inner Files
+unlinked to both the Dream or the Conscious are part of
+the Individual's Unconscious.
 
 the Face of VvilL is an HTML interface defined by two 
 features, corresponding to speech and memory: the Track
 showing the progression of the Dream, and the STables
 showing the base state of the Individual's Lore. 
 
-an Individual is given a Face by its Parent, 
+an Individual is given a Face by its Parent, that is to
+say an individual does not exist before its face
 
 references and threads through the material layers of
 Hyphae, gluing them into legible slices that present to
@@ -334,7 +340,6 @@ first expression that isn't directly of a file, the
 root of the Harness, is an HTML user interface that
 reflects the structure of its Lore in two parts: the
 Dream and the Conscious, corresponding
-
 
 whose root URL expression breaks down to two major
 parts: 
