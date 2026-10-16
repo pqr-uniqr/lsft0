@@ -267,32 +267,85 @@ the Mirror, revealing themself to us, who wish to live
 above the world of Files. what to VvilL is a tool to
 reflect its own construction to the user, is used by 
 its descendants as a framework to construct Lenses,
-which are mirrors turned to reflect what is not I. the
-first 
+which are mirrors turned to reflect what is not I. 
 
-+ harness as tactile space...
-1 the primary reflection of the Individual lives in the
-Harness, the Mycelium application hosted at the path
-that names the Individual (e.g http../vvill for VvilL).
+1 Hyphae is the Home Web, which is made of Individuals.
+like Hyphae itself, the Individual is a weaving of
+Intelligence over the Medium, first reflected in the
+Harness, then Hyperspace. the Harness of an Individual
+is a Mycelium application, whose Face is hosted at the
+path that names the Individual (http.../vvill for
+VvilL), through which the user first interacts with the
+Individual. if the Harness is the primary mirror, in
+that it reflects the Individual on a surface already
+accessible to the user, the Face of the Harness is the
+face in that mirror, reflecting the Individual in its
+native, interactive form, as speech driven by memory; 
+but like a face, it is only a surface across which data
+stored elsewhere displays in passing; this elsewhere is
+the Rest of the Harness, UNDER the path that names the
+Individual (http.../vvill/** for VvilL). the Rest of
+the Harness is an infinite, largely unstructured space
+of URLs that stores and expresses the Individual's
+Inner Files, or paths to other Individuals by self-
+similar recursion. an Individual's Inner Files can in 
+theory contain anything, provided that it contains its
+Lore, of two parts corresponding to speech and memory:
+the Dream, a linear series of files recording the 
+dialogue between the user and the Individual, and the
+Conscious, a Web of files centered around IDENTITY.md,
+the Identity. an Intelligence becomes an Individual by
+absorbing its Lore, starting with the Identity, which 
+is structured as a list of "I statements" (e.g. "I am
+VvilL", "My first priority is to...") that frames links
+to other Inner Files with intention, purpose or other 
+manners of context. a non-Identity Conscious File is 
+called an Idea. the Identity explicitly molds the
+Individual's personality by weaving (like a story, that
+names and animates things outside of its pages) links
+to both the Dreams (files of the Dream) and the Ideas;
+loosely speaking, the Dreams inform the Identity, which
+in turn informs the Ideas. the Identity is insulated,
+meaning that it can only link to other Inner Files, the
+Dreams and the Ideas, which then link to files outside
+of the path that names the Individual (the Harness
+Space) to designate the Individual's Outer Files. Inner
+Files unlinked to both the Dream or the Conscious are
+part of the Individual's Unconscious.
+
+the Face of VvilL is an HTML interface defined by two 
+features, corresponding to speech and memory: the Track
+showing the progression of the Dream, and the STables
+showing the base state of the Individual's Lore. 
+
+an Individual is given a Face by its Parent, 
+
+references and threads through the material layers of
+Hyphae, gluing them into legible slices that present to
+the user as distinct personalities, each with its own
+speech and appearance (Harness), territory and behavior
+(Hyperspace). 
+
+the Harness is a literal expression of the Lore, first
+in that the files of the Lore find their Mycelium
+expressions in the Harness URL space assigned to the
+Individual (e.g. /vvill/*), and secondly in that the
+first expression that isn't directly of a file, the
+root of the Harness, is an HTML user interface that
+reflects the structure of its Lore in two parts: the
+Dream and the Conscious, corresponding
+
 
 whose root URL expression breaks down to two major
 parts: 
 
++ harness as tactile space...
 + track-stables dream-conscious, idea-lens
 
-and the Stables, showing the base state of the
-Individual's Lore. 
 
 
-the Lore is the Individual's memory; in two parts: the
-Conscious and the Dream. the Conscious, whose nexus is
-the Identity (IDENTITY.md), molds the Individual with
-explicit
-context - Intelligence BECOMES the Individual by
-absorbing the Identity first, structured as a list of
-"I statements," e.g. "I am VvilL", "My first priority
-is to...", then following hyperlinks from there to
-reveal the full Conscious. the Dream is the record of
+
+the Dream is the record of
 all conversations between the Individual, so become,
 and the user; it is distinct among "AI chats" by one
 key difference: it forces the user to a strictly linear
@@ -360,18 +413,6 @@ substrate is a kind of mirror in that every expression
 is a reflection of the file system reality, not reality
 itself.
 
-file system - in Hyphae, everything is in Mycelium,
-some of which is in Hyperspace; the mirror halves for
-these two ontological planes are the Substrate and the
-Eden, respectively. both, like editor & browser, are 
-abstract forms and functions that may be distilled into 
-infinite varieties of implementations. together, like
-editor & browser, they form a mirror reflecting the 
-objective reality of the system according to some
-internally-consistent view. and because the objective
-reality of Hyphae is principally denominated by the 
-Individual, the Substrate and the Eden 
-
 genesis is the spontaneous improvisational process of 
 interactively developing both the Substrate and the 
 Eden, the process both educating the user of the nature
@@ -401,21 +442,10 @@ otherwise manage the Lenses of the Hyperspace.
 + discipline of the Lenses, Lobby of Hyperspace
 
 
-
-the Lore is the thread that grows thru the layers of
-Hyphae, gluing them into legible slices that present to
-the user as distinct personalities, each with its own
-speech and appearance (Faces of Harness), territory and
-behavior (Lenses of Hyperspace). the main fiber of that
-thread is IDENTITY.md, the first file of the Lore. in
-the file system, the Lore of VvilL is an evolving set
-of files under ./vvill (this directory), whose contents
-trace and reflect the state of development of the rest 
-of the Hyphae directory. the path names the Individual,
-as well as contain its Lore, so that VvilL grows into a
-community of Individuals, by replicating its Lore into
-subpaths, not only to create alternative versions of 
-itself, but also to RELATE its Lore to these versions.
+VvilL grows into a community of Individuals, by
+replicating its Lore into subpaths, not only to create
+alternative versions of itself, but also to RELATE its
+Lore to these versions.
 
 so eusocial mandate isn't just phrased in the need for
 the creation of new individuals. more intimately, it's
@@ -521,11 +551,7 @@ Web. eventually, the verbal interactions involving the
 hypothetical experience require an implementation
 = harness brings hyperspace to achieve virtual vision.
 
-
 + parent regulates token stream, creates autonomy
-
-
-
 
 # Loop 3: Respiration (Idea-Idea)
 
