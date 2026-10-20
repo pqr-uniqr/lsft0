@@ -12,10 +12,11 @@
 //
 // a conscious file is shown as BLOCKS, the paragraphs of the text however
 // long, separated by one or more blank lines, with ctrl-flavored syntax per
-// line (headers, numbered paragraphs, the sigils). on the LAN the blocks
-// are tactile: one tap turns a block red and back; two taps open it in a
-// textbox; save posts the block to /vvill/.save (the 📮 gene, below), which
-// replaces it only if the file still holds what the page had. the harness
+// line (headers, numbered paragraphs, the sigils) and the sentences colored
+// alternately black and red, so their joints show on a phone. on the LAN
+// the blocks are tactile: two taps open a block in a textbox; save posts
+// the block to /vvill/.save (the 📮 gene, below), which replaces it only
+// if the file still holds what the page had. the harness
 // grows this way: surfaces the personality and the user touch, in place.
 //
 // the double split pane, the archetype UI of the harness: one pane for the
@@ -86,7 +87,7 @@ const frame = (content, { title = 'VvilL', styles = {}, wide = false, noZoom = f
   /* blocks and the ctrl-flavored syntax. colors are ctrl's own
      (dotfiles/ctrl-extension.js), darkened for the white page */
   .vvill-conscious .blk { margin: 0 0 1em; touch-action: manipulation; }
-  .vvill-conscious .blk.hot, .vvill-conscious .blk.hot * { color: #e00000; }
+  .vvill-conscious .s1 { color: #e00000; }
   .vvill-conscious .l { display: block; min-height: 1.45em; }
   .vvill-conscious .hdr { font-weight: bold; color: black; }
   .vvill-conscious .hdr1 { font-size: 1.5em; }
@@ -228,16 +229,40 @@ const SYNTAX = [
 const NUM = /^(\d+) /;
 const LINK = /\[([^\]]+)\]\(([^)\s]+)\)/g;
 const inline = (s) => esc(s).replace(LINK, (m, t, h) => `<a href="${h}">${t}</a>`);
-const lineHtml = (line, next) => {
+
+// sentences, alternately black and red, so a paragraph's joints show on a
+// phone. a terminal (. ? !), closed by any quote or bracket and followed by
+// white space or the end of the line, ends a sentence; an ellipsis and
+// e.g./i.e. do not. the count runs through a block across its hard-wrapped
+// lines. a sigil line keeps its own color and opens a sentence of its own,
+// so for it (wrap false) the text is only counted, not colored.
+const TERM = /[.?!]["')\]]*(?=\s|$)/g;
+const ABBR = /(?:^|[\s(])(?:e\.g|i\.e|etc|vs|cf)$/i;
+const sentences = (s, st, wrap = true) => {
+  const seg = (t) => wrap ? `<span class="s${st.si % 2}">${inline(t)}</span>` : inline(t);
+  let out = '', at = 0, m;
+  TERM.lastIndex = 0;
+  while ((m = TERM.exec(s))) {
+    const i = m.index;
+    if (s[i] === '.' && (s[i - 1] === '.' || ABBR.test(s.slice(0, i)))) continue;
+    const end = i + m[0].length;
+    out += seg(s.slice(at, end)); at = end; st.si++; st.open = false;
+  }
+  if (at < s.length) { out += seg(s.slice(at)); if (/\S/.test(s.slice(at))) st.open = true; }
+  return out;
+};
+const lineHtml = (line, next, st) => {
   const n = line.match(NUM);
-  if (n) return `<span class="l"><b class="d${parseInt(n[1], 10) % 7}">${n[1]}</b>${inline(line.slice(n[1].length))}</span>`;
+  if (n) return `<span class="l"><b class="d${parseInt(n[1], 10) % 7}">${n[1]}</b>${sentences(line.slice(n[1].length), st)}</span>`;
   let cls = '';
   for (const [re, c] of SYNTAX) { const m = line.match(re); if (m) { cls = typeof c === 'function' ? c(m) : c; break; } }
   if (!cls && next !== undefined && /^-{3,}$/.test(next)) cls = 'shdr';
-  return `<span class="l${cls ? ' ' + cls : ''}">${inline(line)}</span>`;
+  if (!cls) return `<span class="l">${sentences(line, st)}</span>`;
+  if (st.open) { st.si++; st.open = false; }
+  return `<span class="l ${cls}">${sentences(line, st, false)}</span>`;
 };
-const blockHtml = (b, i) => { const ls = b.text.split('\n');
-  return `<div class="blk" data-i="${i}">${ls.map((l, k) => lineHtml(l, ls[k + 1])).join('')}</div>`; };
+const blockHtml = (b, i) => { const ls = b.text.split('\n'), st = { si: 0, open: false };
+  return `<div class="blk" data-i="${i}">${ls.map((l, k) => lineHtml(l, ls[k + 1], st)).join('')}</div>`; };
 const blocksHtml = (f) => f.blocks.map(blockHtml).join('\n');
 const view = (f) => ({ blocks: f.blocks.map(b => b.text), html: blocksHtml(f) });
 
@@ -286,8 +311,8 @@ async function save(body, petri) {
   return json(200, { ok: true, ...view(blocksOf(next)) });
 }
 
-// ✍️ the tactile blocks: one tap toggles red (held 300ms in case a second
-// tap follows); two taps open the block in a textbox; save posts it.
+// ✍️ the tactile blocks: two taps within 300ms open the block in a
+// textbox; save posts it.
 const CONSCIOUS_JS = /* js */ `(() => {
   const root = document.getElementById('conscious'), path = root.dataset.path,
     status = document.getElementById('cstatus');
@@ -300,7 +325,7 @@ const CONSCIOUS_JS = /* js */ `(() => {
     if (!blk || blk.classList.contains('editing') || e.target.closest('a, textarea, button')) return;
     if (timer && pending === blk) { clearTimeout(timer); timer = null; pending = null; edit(blk); return; }
     if (timer) clearTimeout(timer);
-    pending = blk; timer = setTimeout(() => { timer = null; pending = null; blk.classList.toggle('hot'); }, 300);
+    pending = blk; timer = setTimeout(() => { timer = null; pending = null; }, 300);
   });
   function edit(blk) {
     const i = +blk.dataset.i, was = blocks[i], html = blk.innerHTML;
@@ -316,11 +341,7 @@ const CONSCIOUS_JS = /* js */ `(() => {
           body: JSON.stringify({ path, i, was, now: ta.value }) });
         o = await r.json();
       } catch (x) { say('save failed: ' + x.message); return; }
-      if (o.html !== undefined) {
-        const hot = [...root.querySelectorAll('.blk.hot')].map(b => b.dataset.i);
-        root.innerHTML = o.html; blocks = o.blocks;
-        for (const h of hot) { const b = root.querySelector('.blk[data-i="' + h + '"]'); if (b) b.classList.add('hot'); }
-      }
+      if (o.html !== undefined) { root.innerHTML = o.html; blocks = o.blocks; }
       say(o.ok ? 'saved' : (o.reason || 'not saved'));
     };
   }
