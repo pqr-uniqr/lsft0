@@ -447,21 +447,30 @@ executing the Genesis Seed to define the Individual,
 and by extension, its Organization. in order for the
 Dream Genesis to end with a Transition to Willow's
 Dream, Willow must have a Dream, which must be visible
-on her Face. the Individual's Face, initially sculpted
+on her Face, which she inherits from VvilL's own Face,
+which is defined by two key features, corresponding to
+the Dream and the Conscious: the Track and the Stables.
+the Track shows the contents of the Dream as a timeline
+of Events, visualizing the Dream files, along with the
+"live" Dream (if exists) on the Paddock, as an HTML
+chat application where the user can review or continue
+the Dream. the Individual's Face is initially sculpted
 by its parent (VvilL's parentage is special, because it
-crosses the boundaries of Incarnations), is defined by 
-two key features, corresponding to the Dream and the 
-Conscious: the Track and the Stables. the Track shows
-the contents of the Dream as a timeline of Events, 
-visualizing the underlying sequence of Dream files, 
-along with the "live" Dream (if exists) on the Paddock,
-into an HTML chat application where the user can view,
-edit or continue the Dream. 
+crosses the boundaries of Incarnations), but grows into
+its own, developing extra features and styles as the 
+Dream progresses. there is no structural requirement to
+the storage format of the Dream (which will depend on 
+the provider of Intelligence), or to the contents of 
+the Dream itself, provided that it can be stored in a 
+series of files.
 
 the user can edit the Dream by continuing it
 
 the underlying format of files that record the
 interaction between the user and Intelligence 
+
+
+harness as tactile 
 
 then transition prompt is called eusocial condition... 
 
