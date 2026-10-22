@@ -12,8 +12,9 @@
 //
 // a conscious file is shown as BLOCKS, the paragraphs of the text however
 // long, separated by one or more blank lines, with ctrl-flavored syntax per
-// line (headers, numbered paragraphs, the sigils) and the sentences colored
-// alternately black and red, so their joints show on a phone. on the LAN
+// line (headers, numbered paragraphs, the sigils), the sentences colored
+// alternately black and red and numbered in a gutter, so their joints show
+// on a phone. on the LAN
 // the blocks are tactile: two taps open a block in a textbox; save posts
 // the block to /vvill/.save (the 📮 gene, below), which replaces it only
 // if the file still holds what the page had. the harness
@@ -57,12 +58,47 @@ const crumb = (cpath) => {
   return `<p class="vvill-crumb">/${parts.join('/')}</p>`;
 };
 
+// dark mode: the rules as [selector, declarations], emitted twice: under
+// the device's preference unless the page pins light, and under a pinned
+// dark. the pin is data-theme on <html>, set from localStorage by the head
+// script before paint and toggled by a tap on a conscious file's first
+// block (CONSCIOUS_JS). a 🎨 subgene's colors, if given, hold in both modes.
+const darkRules = (styles) => [
+  ['body', `background: ${styles.bgColor || '#000000'}; color: ${styles.textColor || '#ffffff'};`],
+  ['a', 'color: #6ab0ff;'],
+  ['.vvill-bar, .vvill-stables, .vvill-say', 'border-color: #fff;'],
+  ['.vvill-say, .vvill-say textarea, .vvill-say button, .vvill-wipe, .vvill-conscious textarea, .vvill-conscious .ctl button',
+    'background: #000; color: #fff; border-color: #fff;'],
+  ['.vvill-status, .convo h3, .turn.tool', 'color: #aaa;'],
+  ['.convo h3', 'border-color: #444;'],
+  ['.turn.user', 'background: #222;'],
+  ['.vvill-conscious .hdr', 'color: #fff;'],
+  ['.vvill-conscious .s1', 'color: #3d9bff;'],
+  // ctrl's syntax in its original editor colors (the light page darkens them)
+  ['.vvill-conscious .d0', 'color: #ff0000;'], ['.vvill-conscious .d1', 'color: #ff8000;'],
+  ['.vvill-conscious .d2', 'color: #ffff00;'], ['.vvill-conscious .d3', 'color: #00ff00;'],
+  ['.vvill-conscious .d4', 'color: #0080ff;'], ['.vvill-conscious .d5', 'color: #0000ff;'],
+  ['.vvill-conscious .d6', 'color: #8000ff;'],
+  ['.vvill-conscious .gt', 'color: #009400;'], ['.vvill-conscious .tilde', 'color: #ff0000;'],
+  ['.vvill-conscious .sep, .vvill-conscious .shdr', 'color: #fff;'],
+  ['.vvill-conscious .plus', 'color: #5fafaf;'], ['.vvill-conscious .dash', 'color: #ff87d7;'],
+  ['.vvill-conscious .eq', 'color: #fffff0;'], ['.vvill-conscious .pipe', 'color: #39ff14;'],
+  ['.vvill-conscious .dot', 'color: #ff00ff;'], ['.vvill-conscious .comma', 'color: #fff;'],
+  ['.vvill-conscious .caret', 'color: #ff8700;'], ['.vvill-conscious .dollar', 'color: #ffd700;'],
+  ['.vvill-conscious .at', 'color: #888;'], ['.vvill-conscious .slash', 'color: #fff;'],
+  ['.vvill-conscious .bslash', 'color: #000; background: rgba(255, 255, 255, 0.28);'],
+  ['.vvill-conscious .bang', 'color: #00bfff;'], ['.vvill-conscious .topic', 'color: #808080;'],
+  ['.vvill-conscious .done', 'color: #777;'], ['.vvill-conscious .cp', 'color: #5fd7ff;'],
+];
+const darkCss = (styles, pre) => darkRules(styles).map(([s, d]) => `${pre} ${s} { ${d} }`).join('\n    ');
+
 const frame = (content, { title = 'VvilL', styles = {}, wide = false, noZoom = false } = {}) => /* html */ `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1${noZoom ? ', maximum-scale=1' : ''}">
 <title>${esc(title)}</title>
+<script>try { var t = localStorage.getItem('vvill-theme'); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
 <style>
   body {
     background: ${styles.bgColor || '#ffffff'};
@@ -88,7 +124,14 @@ const frame = (content, { title = 'VvilL', styles = {}, wide = false, noZoom = f
      (dotfiles/ctrl-extension.js), darkened for the white page */
   .vvill-conscious .blk { margin: 0 0 1em; touch-action: manipulation; }
   .vvill-conscious .s1 { color: #e00000; }
-  .vvill-conscious .l { display: block; min-height: 1.45em; }
+  .vvill-conscious .l { display: block; min-height: 1.45em; position: relative; }
+  /* the gutter: sentence numbers, level with the line each begins on,
+     three quarters the size and faded, in the sentence's color. they
+     hang in the page's own left margin, so the text keeps its full
+     width and size. the number's line-height is the text's line box
+     (1.45 / 0.75) so it sits level with the first line */
+  .vvill-conscious .g { position: absolute; right: 100%; margin-right: 0.35em; white-space: nowrap;
+    font-size: 0.75em; line-height: 1.9333em; opacity: 0.45; }
   .vvill-conscious .hdr { font-weight: bold; color: black; }
   .vvill-conscious .hdr1 { font-size: 1.5em; }
   .vvill-conscious .hdr2 { font-size: 1.3em; }
@@ -141,6 +184,14 @@ const frame = (content, { title = 'VvilL', styles = {}, wide = false, noZoom = f
   .vvill-say textarea { flex: 1; font: inherit; font-size: 16px; resize: none;
     border: 1px solid #000; padding: 6px; }
   .vvill-say button { font: inherit; border: 1px solid #000; background: #fff; padding: 0 12px; }
+  /* dark mode: with the device, unless pinned light; or pinned dark */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { color-scheme: dark; }
+    ${darkCss(styles, ':root:not([data-theme="light"])')}
+  }
+  :root[data-theme="dark"] { color-scheme: dark; }
+  :root[data-theme="light"] { color-scheme: light; }
+  ${darkCss(styles, ':root[data-theme="dark"]')}
 </style>
 </head>
 <body>
@@ -230,39 +281,66 @@ const NUM = /^(\d+) /;
 const LINK = /\[([^\]]+)\]\(([^)\s]+)\)/g;
 const inline = (s) => esc(s).replace(LINK, (m, t, h) => `<a href="${h}">${t}</a>`);
 
-// sentences, alternately black and red, so a paragraph's joints show on a
-// phone. a terminal (. ? !), closed by any quote or bracket and followed by
-// white space or the end of the line, ends a sentence; an ellipsis and
-// e.g./i.e. do not. the count runs through a block across its hard-wrapped
-// lines. a sigil line keeps its own color and opens a sentence of its own,
-// so for it (wrap false) the text is only counted, not colored.
+// sentences, alternately black and red and numbered in a GUTTER, so a
+// paragraph's joints show on a phone. a terminal (. ? !), closed by any
+// quote or bracket and followed by white space or the end of the line, ends
+// a sentence; an ellipsis and e.g./i.e. do not. the count is strict and
+// two-level: it runs through a block's RUN, the plain lines from its start
+// across their hard wraps, and the first sigil line (+, >, a header, a
+// rule...) interrupts it; the rest of that block is plain, and the next
+// block starts a run of its own. the first sentence goes unnumbered.
 const TERM = /[.?!]["')\]]*(?=\s|$)/g;
 const ABBR = /(?:^|[\s(])(?:e\.g|i\.e|etc|vs|cf)$/i;
-const sentences = (s, st, wrap = true) => {
-  const seg = (t) => wrap ? `<span class="s${st.si % 2}">${inline(t)}</span>` : inline(t);
-  let out = '', at = 0, m;
+const LEAD = /^\s*(?:[>~+\-=|.,^$@\/\\!]|[a-z]:|x+ )?\s*/i;
+const words = (t) => t.match(LEAD)[0].length < t.length; // a word past any sigil
+// a line cut into its sentence pieces [{ t, si }], counting in st
+const cut = (s, st) => {
+  const pieces = []; let at = 0, m;
+  const push = (t) => { pieces.push({ t, si: st.si }); if (words(t)) st.open = true; };
   TERM.lastIndex = 0;
   while ((m = TERM.exec(s))) {
     const i = m.index;
     if (s[i] === '.' && (s[i - 1] === '.' || ABBR.test(s.slice(0, i)))) continue;
     const end = i + m[0].length;
-    out += seg(s.slice(at, end)); at = end; st.si++; st.open = false;
+    push(s.slice(at, end)); at = end; st.si++; st.open = false;
   }
-  if (at < s.length) { out += seg(s.slice(at)); if (/\S/.test(s.slice(at))) st.open = true; }
-  return out;
+  if (at < s.length) push(s.slice(at));
+  return pieces;
 };
-const lineHtml = (line, next, st) => {
-  const n = line.match(NUM);
-  if (n) return `<span class="l"><b class="d${parseInt(n[1], 10) % 7}">${n[1]}</b>${sentences(line.slice(n[1].length), st)}</span>`;
+// a line's class by its first characters, as SYNTAX says
+const classOf = (line, next) => {
   let cls = '';
   for (const [re, c] of SYNTAX) { const m = line.match(re); if (m) { cls = typeof c === 'function' ? c(m) : c; break; } }
   if (!cls && next !== undefined && /^-{3,}$/.test(next)) cls = 'shdr';
-  if (!cls) return `<span class="l">${sentences(line, st)}</span>`;
-  if (st.open) { st.si++; st.open = false; }
-  return `<span class="l ${cls}">${sentences(line, st, false)}</span>`;
+  return cls;
 };
-const blockHtml = (b, i) => { const ls = b.text.split('\n'), st = { si: 0, open: false };
-  return `<div class="blk" data-i="${i}">${ls.map((l, k) => lineHtml(l, ls[k + 1], st)).join('')}</div>`; };
+// a block: its lines and the gutter. the run is cut into sentences; of a
+// run of two or more, each but the first is numbered once, in the gutter
+// of the first of its lines whose gutter is free (two sentences may begin
+// on one line; the first sentence keeps its line though it shows no
+// number), small and faded, in the sentence's color.
+const blockHtml = (b, i) => {
+  const ls = b.text.split('\n'), st = { si: 0, open: false };
+  let run = true;
+  const lines = ls.map((l, k) => {
+    const n = l.match(NUM), num = n ? n[1] : '', rest = num ? l.slice(num.length) : l;
+    const cls = num ? '' : classOf(l, ls[k + 1]);
+    if (cls) run = false;
+    return { cls, num, pieces: run ? cut(rest, st) : [{ t: rest, si: -1 }] };
+  });
+  const on = new Map(); // sentence -> its lines
+  lines.forEach((ln, k) => ln.pieces.forEach(p => { if (p.si >= 0 && words(p.t)) on.set(p.si, (on.get(p.si) || []).concat(k)); }));
+  const name = new Map(); // line -> the sentence that claims its gutter
+  if (on.size > 1) for (const [si, ks] of [...on].sort((a, b) => a[0] - b[0])) { const k = ks.find(k => !name.has(k)); if (k !== undefined) name.set(k, si); }
+  const shown = (k) => name.has(k) && name.get(k) > 0;
+  const html = lines.map((ln, k) => {
+    const g = shown(k) ? `<span class="g s${name.get(k) % 2}">${name.get(k)}</span>` : '';
+    const num = ln.num ? `<b class="d${parseInt(ln.num, 10) % 7}">${ln.num}</b>` : '';
+    const body = ln.pieces.map(p => p.si < 0 ? inline(p.t) : `<span class="s${p.si % 2}">${inline(p.t)}</span>`).join('');
+    return `<span class="l${ln.cls ? ' ' + ln.cls : ''}">${g}${num}${body}</span>`;
+  }).join('');
+  return `<div class="blk" data-i="${i}">${html}</div>`;
+};
 const blocksHtml = (f) => f.blocks.map(blockHtml).join('\n');
 const view = (f) => ({ blocks: f.blocks.map(b => b.text), html: blocksHtml(f) });
 
@@ -312,7 +390,8 @@ async function save(body, petri) {
 }
 
 // ✍️ the tactile blocks: two taps within 300ms open the block in a
-// textbox; save posts it.
+// textbox; save posts it. the first block, tapped once, turns dark mode on
+// or off.
 const CONSCIOUS_JS = /* js */ `(() => {
   const root = document.getElementById('conscious'), path = root.dataset.path,
     status = document.getElementById('cstatus');
@@ -325,8 +404,20 @@ const CONSCIOUS_JS = /* js */ `(() => {
     if (!blk || blk.classList.contains('editing') || e.target.closest('a, textarea, button')) return;
     if (timer && pending === blk) { clearTimeout(timer); timer = null; pending = null; edit(blk); return; }
     if (timer) clearTimeout(timer);
-    pending = blk; timer = setTimeout(() => { timer = null; pending = null; }, 300);
+    pending = blk; timer = setTimeout(() => { timer = null; pending = null; if (blk.dataset.i === '0') theme(); }, 300);
   });
+  // dark mode on or off, pinned in localStorage and read before paint by
+  // the frame's head script. a choice that matches the phone's own is
+  // unpinned, so the page follows the phone again.
+  function theme() {
+    const html = document.documentElement, sys = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    const now = html.dataset.theme || sys, want = now === 'dark' ? 'light' : 'dark';
+    try {
+      if (want === sys) { delete html.dataset.theme; localStorage.removeItem('vvill-theme'); }
+      else { html.dataset.theme = want; localStorage.setItem('vvill-theme', want); }
+    } catch (x) { html.dataset.theme = want; }
+    say(want === sys ? want + ', with the phone' : want + ', pinned');
+  }
   function edit(blk) {
     const i = +blk.dataset.i, was = blocks[i], html = blk.innerHTML;
     blk.classList.add('editing');
