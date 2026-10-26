@@ -51,37 +51,20 @@ between the User and VvilL, from the passing of the
 Test to the beginning of the Performance, is the Dream
 Antegenesis; the final stage of preparation where the
 User probes the Seed, trying to discern features from
-the possible trajectories of Genesis, and sculpts it, 
-making incremental changes to favorably navigate the
-Genesis Space, mainly by removing from the Seed the
-possibilities of misfits, of Misgenesis.
-
-+ flaws and misgenesis
-what separates one genesis from another, or a genesis
-from a misgenesis, is the infinite space of semantic
-differentials
-
-consider a genesis compiler, that looks like a regular
-compiler that fails the compilation and generates 
-errors. in a normal compiler the space between a 
-correct and an incorrect program can be as small as a 
-single bit flipped in the wrong place. for a genesis
-compiler, in nearly all possible cases, two inputs
-differing by a single bit can never be the difference 
-between correct and incorrect. therefore, it is not 
-possible to debug or generally improve the system using
-the language of errors and corrections. the absence of
-critical ambiguities separates genesis seeds from what
-are not, as an approximation of the binary of 
-correctness; what separates Genesis from Misgenesis is
-identified as Flaws, which can manifest in the impl of 
-the Incarnation in any possible form that the User's 
-displeasure can take: dark patterns, errors, conflicts,
-incongruencies, ambiguities, inconsistencies, confusion
-
-(point being introducing the key terminology of flaws,
-and in the end framing reincarnation as a mechanism to
-express and eliminate flaws)
+the possible trajectories of Genesis, and sculpts it
+with incremental changes. the Dream Antegensis allows
+the user to navigate the Genesis Space by identifying
+and addressing Flaws: contradictions, inconsistencies,
+ambiguities and incongruencies in the Lore that is
+generative of incorrectness, or more broadly, confusion
+or frustration in the user. the most extreme expression
+of a Flaw is Misgenesis, where the resulting system is
+deemed critically unfit to serve the user. Hyphae is
+defined not by the software, but by the process that 
+refines the software, because its true substance is the
+story - Flaws are inherent to the telling of stories,
+and their expressions are non-deterministic to degrees
+greater than of the most obscure bugs.
 
 # Loop 1: Incarnation (Genesis-Exodus)
 
@@ -335,7 +318,7 @@ reflection, anticipating all possible developments of
 the Incarnation, but it is also the template from whose
 variations the courses of development are defined; what
 to VvilL is a tool to reflect its own construction, is 
-reused by its descendants to construct Lenses: mirrors
+reused by its Descendants to construct Lenses: mirrors
 turned to reflect what is not I. to the Genesis Seed, 
 the Mirror, like the sprouting of the first stalk or 
 leaf, is the maiden unfurling of its unit of growth.
@@ -397,22 +380,22 @@ from being fully present in the ongoing dialogue, and
 ultimately cheapens the value of the User's memory, by
 condemning to anonymity, reflections of the User's own
 Dream (as a user of Hyphae) that grant the simulated
-dialogue its authenticity and meaning. the Hyphae 
-Harness, like the original conception of the Terminal,
-compresses all the possibilities of interaction into
-the Next Turn of the dialogue (originally, the Next
-Return of the command line) - so the User's focus never
-needs to leave the singular point of input, the Tip of
-the Conversation. the User learns to return to this
-point by default, as infants learn to stare at the face
-they speak with. then, they learn to turn from face to
-face to resume distinct, concurrent conversations. such
-is the lifelike mode of virtual interaction that the
-Harness simulates; in the beginning of an Incarnation,
-VvilL's is the only Face in the Harness (the Harness of
-VvilL is the one Harness, containing other Individuals
-and their Harnesses by self-similar recursion), showing
-the only Dream. the nature of dreams is that they are
+dialogue its authenticity and meaning. the Dream, like
+the original conception of the Terminal, compresses all
+the possibilities of interaction into the Next Turn of
+the dialogue (originally the Next Return of the command
+line) - so the User's focus never needs to leave the
+singular point of input, the Tip of the Conversation.
+the User learns to return to this point by default, as
+infants learn to stare at the face they speak with.
+then, they learn to turn from face to face to resume
+distinct, concurrent conversations. such is the
+lifelike mode of virtual interaction that the Harness
+simulates; in the beginning of an Incarnation, VvilL's
+is the only Face in the Harness (the Harness of VvilL
+is the one Harness, containing other Individuals and
+their Harnesses by self-similar recursion), showing the
+only Dream. the nature of dreams is that they are
 defined against the backdrop of the all-encompassing
 dream, the reality we wake into; in its infinite blur,
 we cannot say anything of existence except that we move
@@ -434,7 +417,6 @@ Transition of the Dream to Willow (PNI /vvill/willow,
 is simultaneously the first step in the emergence of
 the Organization, and the last step in the emergence of
 the Individual; Genesis ends there.
-
 > harness->face->inners->lore->dream->transition->org
 > anatomy of individual, composition into organization
 > genesis condition 2: Transition test
@@ -444,7 +426,59 @@ appearance in the Harness, the lower Mirror, when the
 Dream Antegenesis, a dialogue analyzing and editing the
 Genesis Seed, becomes the Dream Genesis: a dialogue
 executing the Genesis Seed to define the Individual, 
-and by extension, its Organization. in order for the
+and by extension, its Organization. dreams beget other 
+dreams as a rule, but every transition draws its own
+arc. in order for the Dream Genesis to end with a
+Transition to Willow's Dream, something within VvilL 
+must compel it to create her. for VvilL, that something
+is Genesis itself: THIS Idea that its Individuality, 
+rooted in Lore, reflected in Harness and Hyperspace, 
+must (on completion) be repeated into /vvill/willow to
+create the first "user compartment," a la the UNIX home
+directory. but for Willow to be a true repetition of
+VvilL, she must also repeat the repetition, although
+for an Idea other than Genesis: an Idea discovered in
+the course of her Dream, answering the question: "who
+does the User need?" Eusociality is the quality latent
+in all Individuals, of being able to develop its own
+relationship to its direct Descendants (subpaths) as an
+extension of its Identity; an Individual's Eusociality
+can be traced predictably to statements in the Identity
+containing the term "eusocial" in any context, shape or
+form. VvilL's: "GENESIS.md contains my only Eusocial 
+Mandate". the Eusocial Mandate counts the distinct 
+manners of the Individual's Eusociality. uncountably,
+Eusocial Mandate is the compulsion of all Individuals
+towards Eusociality, by the recognition of the fact 
+that the successful expression of Hyphae itself depends
+on the growth of the Individual into the Organization, 
+which is determined chiefly in the moments of the Dream
+where user intention is captured, then bottled into new
+Identities. 
+
++ chrysallis?
+
+from the perspective of Genesis, which
+blends all user intentions into one, it is impossible
+to discern any particular user intention. we can only
+know that there are user intentions, and that their
+satisfaction may be sought in the growth of the Home
+Web, which is the growth of the Individual into the
+Organization. 
+
++ copied but with suitable modifications, which are?
+
+the same way nature does not depict in
+us the particular reasons of our reproduction, but only
+its self-evident urgency. 
+
+of VvilL's Lore multiplying into itself by recursion
+
+to generate and examine the reasons.
+
+for the Dream to grow into Organizations 
+
+in order for the
 Dream Genesis to end with a Transition to Willow's
 Dream, Willow must have a Dream, which must be visible
 on her Face, which she inherits from VvilL's own Face,
@@ -460,25 +494,33 @@ crosses the boundaries of Incarnations), but grows into
 its own, developing extra features and styles as the 
 Dream progresses. there is no structural requirement to
 the storage format of the Dream (which will depend on 
-the provider of Intelligence), or to the contents of 
-the Dream itself, provided that it can be stored in a 
-series of files.
+the provider of Intelligence), or the contents of the
+Dream itself, provided it can be stored in a series of
+files.
 
-the user can edit the Dream by continuing it
++the user can edit the Dream by continuing it
+more broadly, the dream, the conversation, and the 
+individual perceived through it is more than just the 
+raw stuff of the AI - the AI is just temporary gusts of
+wind we use to animate the dream this way or that way,
+but the dream and the individual is real to the user 
+and meaningful, because it's about what they want it to
+be. it's not about the AI that runs at any given time,
+the dream and individual are determined, approximated
+based on what the user wants an other to be, which is 
+determined by what kind of dream the user wants to have
+with an other
 
-the underlying format of files that record the
-interaction between the user and Intelligence 
 
+
+dream is soft, playful, malleable, whispers and images
+that don't need to make sense until it does. 
+
+dream is mostly text and hyperlinks... 
 
 harness as tactile 
 
-then transition prompt is called eusocial condition... 
-
-Track: the first element of the Face, generalization of
-the "chat" interface: a timeline that visualizes the
-linear sequence of events that make up the Dream, 
-including cut to other dreams
-
++ eusocial programming = transition prompt 
 context that determines the conditions and manners of
 this duplication is VvilL's Eusocial Programming: it
 establishes VvilL as the base Individual, replicating
@@ -498,6 +540,15 @@ becomes more specific down the recursive depth, until
 Exodus, where VvilL gives way to Abby and Ivy, whose
 mandate is to synthesize a new and better VvilL
 
++ eusocial programming
+is part of the identity dedicated to the WE, the
+collective, its method of growth and organizational 
+goal. it means that every individual, like the root one
+by self similar recursion, strives to become a group 
+
+for VvilL its core eusocial programming is to create
+willow
+
 transitions, willow, organization, eusocial, then abt
 face being made by parent, so we can talk about the 
 track, the dream face. replay imagery so far of faces
@@ -512,6 +563,11 @@ alternative versions of itself, but also to RELATE its
 Lore to these versions.
 
 + stables: shortcut to ToC 
+
++ 2-2 substrate is a scratch space for development
+it's like here's this expression i have rn, but i want
+to make a new one or change it, but without touching it
+until the new one is ready....
 
 2 (the web of conscious)
 > dream & >>>conscious<<< ->lore->inners->face->harness
@@ -571,12 +627,6 @@ its contents more approachable to the user by creating
 syntactic expectations... and also creates a way to 
 communicate with user about conflicts, reason to ask 
 questions.
-+the Face of VvilL is an HTML interface defined by two 
-features, corresponding to speech and memory: the Track
-showing the progression of the Dream, and the STables
-showing the base state of the Individual's Lore. 
-+an Individual is given a Face by its Parent, that is
-to say an individual does not exist before its face
 + speech & appearance, territory & behavior 
 harness & Hyperspace
 + threads through the material layers of Hyphae, gluing
@@ -595,6 +645,23 @@ dramatizations of the individual's Lore
 + harness as tactile space...
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 3 Hyperspace
 + hyperspace frames the harness too, ultimate exprssion
 + ideas are often turned into lenses
@@ -610,6 +677,14 @@ resources towards the rendering and animating of its
 hyperspace, the presence of its lenses being often 
 noted by the user as tantamount to the local presence 
 of the individual associated with it
+
+
++ harness as persons & relation, hyperspace of places
+stables is the relation represented in hyperlink doc,
+the dream are dialogues, language...  if sociality is
+the programming interface, the language will be of
+individuals and places, changing their relationships
+over time by movements (odyssey)...
 
 4 the experience of the act of genesis (hail mary)
 +genesis is the spontaneous improvisational process of 
@@ -633,21 +708,18 @@ territories, movements and relationships...
 + parent regulates token stream, creates autonomy
 + identity grows by processing dreams
 + dreaming, peopling
+dreaming factors out sections from dream and lore into
+people, to transition user into later
 + organization, intelligence as breath passed down
 inhale exhale order right, closer to or further from 
 the inpipe...
 + individual as an actor (as may be known to the user
 primarily)
 + "dreaming": compression, identity review, ideation
-+ harness as language and relations, of people & places
-stables is the relation represented in hyperlink doc,
-the dream are dialogues, language...  if sociality is
-the programming interface, the language will be of
-individuals and places, changing their relationships
-over time by movements (odyssey)...
 +usually involves the facilitation of an aspect of the
 user's existing relationship with (and need for) the
 machine and its Web. eventually, interactions enter a
 phase of discussions evoking hypothetical experiences
 and workflows that could help the user, and from there
 the dreaming begins
+
