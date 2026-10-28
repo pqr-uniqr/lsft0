@@ -19,6 +19,8 @@
 // the block to /vvill/.save (the 📮 gene, below), which replaces it only
 // if the file still holds what the page had. the harness
 // grows this way: surfaces the personality and the user touch, in place.
+// the pure half of this (text to blocks to html) is the KERNEL below,
+// shared with the file's other expressions down the substrate (vim.js).
 //
 // the double split pane, the archetype UI of the harness: one pane for the
 // single continuous conversation with the personality (its past
@@ -44,7 +46,125 @@ const { turnsOf } = require('./atmosphere').register('dream.js');
 const PADDOCK_PORT = parseInt(process.env.PADDOCK_PORT, 10) || 8881;
 const RECENT = 3; // deposited conversations rendered in full; older ones are linked
 
-const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// the KERNEL: the pure half of a conscious file's expression, from raw
+// text to blocks to their html. written to run on either side: here, to
+// render the page; and in an editor's page (the L3 expression, vim.js),
+// where the same function, stringified into the page, re-renders a block
+// as it is typed. so it closes over nothing and takes one option: links,
+// markdown links as anchors (the page) or left as written (an editor,
+// whose columns must match the file's).
+const kernel = ({ links = true } = {}) => {
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  // ✍️ a conscious file as BLOCKS: runs of non-blank lines, separated by runs
+  // of blank lines. the separators are kept verbatim (a lead, then each
+  // block's trailing sep) so an unchanged file reassembles byte for byte:
+  // lead + Σ(text + sep). the page and the save handler split by this one
+  // function and never trust each other's split.
+  function blocksOf(raw) {
+    const parts = raw.split(/(\n(?:[ \t]*\n)+)/);
+    let lead = '';
+    const blocks = [];
+    for (let k = 0; k < parts.length; k += 2) {
+      let text = parts[k]; let sep = parts[k + 1] || '';
+      if (k === 0) { const m = text.match(/^\n+/); if (m) { lead = m[0]; text = text.slice(m[0].length); } }
+      const t = text.match(/\n+$/); if (t) { text = text.slice(0, -t[0].length); sep = t[0] + sep; }
+      if (text === '') { if (blocks.length) blocks[blocks.length - 1].sep += sep; else lead += sep; continue; }
+      blocks.push({ text, sep });
+    }
+    return { lead, blocks };
+  }
+  const joinBlocks = (f) => f.lead + f.blocks.map(b => b.text + b.sep).join('');
+
+  // ctrl-flavored syntax: one class per line by its first characters, first
+  // match wins, the whole line colored (as ctrl does). a numbered paragraph
+  // colors its number only, by n mod 7. the line before a rule of dashes is
+  // a section header. links are markdown's.
+  const SYNTAX = [
+    [/^(#{1,3})\s/, (m) => 'hdr hdr' + m[1].length],
+    [/^-{3,}$/, 'sep'],
+    [/^CP [A-Z]\d{6} \d\d:\d\d/, 'cp'],
+    [/^>/, 'gt'], [/^~/, 'tilde'], [/^\+/, 'plus'], [/^-/, 'dash'], [/^=/, 'eq'], [/^\|/, 'pipe'],
+    [/^\./, 'dot'], [/^,/, 'comma'], [/^\^/, 'caret'], [/^\$/, 'dollar'], [/^@/, 'at'],
+    [/^\//, 'slash'], [/^\\/, 'bslash'], [/^!/, 'bang'],
+    [/^t:/, 'topic'], [/^[a-z]:/i, 'letter'],
+    [/^x+ /, 'done'],
+  ];
+  const NUM = /^(\d+) /;
+  const LINK = /\[([^\]]+)\]\(([^)\s]+)\)/g;
+  const inline = links ? (s) => esc(s).replace(LINK, (m, t, h) => `<a href="${h}">${t}</a>`) : esc;
+
+  // sentences, alternately black and red and numbered in a GUTTER, so a
+  // paragraph's joints show on a phone. a terminal (. ? !), closed by any
+  // quote or bracket and followed by white space or the end of the line, ends
+  // a sentence; an ellipsis and e.g./i.e. do not. the count is strict and
+  // two-level: it runs through a block's RUN, the plain lines from its start
+  // across their hard wraps, and the first sigil line (+, >, a header, a
+  // rule...) interrupts it; the rest of that block is plain, and the next
+  // block starts a run of its own. the first sentence goes unnumbered.
+  const TERM = /[.?!]["')\]]*(?=\s|$)/g;
+  const ABBR = /(?:^|[\s(])(?:e\.g|i\.e|etc|vs|cf)$/i;
+  const LEAD = /^\s*(?:[>~+\-=|.,^$@\/\\!]|[a-z]:|x+ )?\s*/i;
+  const words = (t) => t.match(LEAD)[0].length < t.length; // a word past any sigil
+  // where the sentences of a string end: the offsets just past each terminal
+  const ends = (s) => {
+    const r = []; let m;
+    TERM.lastIndex = 0;
+    while ((m = TERM.exec(s))) {
+      const i = m.index;
+      if (s[i] === '.' && (s[i - 1] === '.' || ABBR.test(s.slice(0, i)))) continue;
+      r.push(i + m[0].length);
+    }
+    return r;
+  };
+  // a line cut into its sentence pieces [{ t, si }], counting in st
+  const cut = (s, st) => {
+    const pieces = []; let at = 0;
+    const push = (t) => { pieces.push({ t, si: st.si }); if (words(t)) st.open = true; };
+    for (const end of ends(s)) { push(s.slice(at, end)); at = end; st.si++; st.open = false; }
+    if (at < s.length) push(s.slice(at));
+    return pieces;
+  };
+  // a line's class by its first characters, as SYNTAX says
+  const classOf = (line, next) => {
+    let cls = '';
+    for (const [re, c] of SYNTAX) { const m = line.match(re); if (m) { cls = typeof c === 'function' ? c(m) : c; break; } }
+    if (!cls && next !== undefined && /^-{3,}$/.test(next)) cls = 'shdr';
+    return cls;
+  };
+  // a block: its lines and the gutter. the run is cut into sentences; of a
+  // run of two or more, each but the first is numbered once, in the gutter
+  // of the first of its lines whose gutter is free (two sentences may begin
+  // on one line; the first sentence keeps its line though it shows no
+  // number), small and faded, in the sentence's color.
+  const blockHtml = (b, i) => {
+    const ls = b.text.split('\n'), st = { si: 0, open: false };
+    let run = true;
+    const lines = ls.map((l, k) => {
+      const n = l.match(NUM), num = n ? n[1] : '', rest = num ? l.slice(num.length) : l;
+      const cls = num ? '' : classOf(l, ls[k + 1]);
+      if (cls) run = false;
+      return { cls, num, pieces: run ? cut(rest, st) : [{ t: rest, si: -1 }] };
+    });
+    const on = new Map(); // sentence -> its lines
+    lines.forEach((ln, k) => ln.pieces.forEach(p => { if (p.si >= 0 && words(p.t)) on.set(p.si, (on.get(p.si) || []).concat(k)); }));
+    const name = new Map(); // line -> the sentence that claims its gutter
+    if (on.size > 1) for (const [si, ks] of [...on].sort((a, b) => a[0] - b[0])) { const k = ks.find(k => !name.has(k)); if (k !== undefined) name.set(k, si); }
+    const shown = (k) => name.has(k) && name.get(k) > 0;
+    const html = lines.map((ln, k) => {
+      const g = shown(k) ? `<span class="g s${name.get(k) % 2}">${name.get(k)}</span>` : '';
+      const num = ln.num ? `<b class="d${parseInt(ln.num, 10) % 7}">${ln.num}</b>` : '';
+      const body = ln.pieces.map(p => p.si < 0 ? inline(p.t) : `<span class="s${p.si % 2}">${inline(p.t)}</span>`).join('');
+      return `<span class="l${ln.cls ? ' ' + ln.cls : ''}">${g}${num}${body}</span>`;
+    }).join('');
+    return `<div class="blk" data-i="${i}">${html}</div>`;
+  };
+  const blocksHtml = (f) => f.blocks.map(blockHtml).join('\n');
+  const view = (f) => ({ blocks: f.blocks.map(b => b.text), html: blocksHtml(f) });
+  return { esc, blocksOf, joinBlocks, ends, blockHtml, blocksHtml, view };
+};
+const { esc, blocksOf, joinBlocks, blockHtml, blocksHtml, view } = kernel();
+
 const when = (ts) => ts ? new Date(ts).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }) : '';
 
 // path segments as links, all but the last
@@ -92,7 +212,7 @@ const darkRules = (styles) => [
 ];
 const darkCss = (styles, pre) => darkRules(styles).map(([s, d]) => `${pre} ${s} { ${d} }`).join('\n    ');
 
-const frame = (content, { title = 'VvilL', styles = {}, wide = false, noZoom = false } = {}) => /* html */ `<!DOCTYPE html>
+const frame = (content, { title = 'VvilL', styles = {}, wide = false, noZoom = false, head = '' } = {}) => /* html */ `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
@@ -192,7 +312,7 @@ const frame = (content, { title = 'VvilL', styles = {}, wide = false, noZoom = f
   :root[data-theme="dark"] { color-scheme: dark; }
   :root[data-theme="light"] { color-scheme: light; }
   ${darkCss(styles, ':root[data-theme="dark"]')}
-</style>
+</style>${head}
 </head>
 <body>
 <div class="vvill-bar"><a href="/vvill">VvilL</a></div>
@@ -242,107 +362,6 @@ ${past}
 <form id="say" class="vvill-say"><textarea id="text" rows="2" placeholder="…" autofocus></textarea><button type="submit">say</button></form>
 <script>${THREAD_JS(cpath)}</script>`, { title, wide: true });
 }
-
-// ✍️ a conscious file as BLOCKS: runs of non-blank lines, separated by runs
-// of blank lines. the separators are kept verbatim (a lead, then each
-// block's trailing sep) so an unchanged file reassembles byte for byte:
-// lead + Σ(text + sep). the page and the save handler split by this one
-// function and never trust each other's split.
-function blocksOf(raw) {
-  const parts = raw.split(/(\n(?:[ \t]*\n)+)/);
-  let lead = '';
-  const blocks = [];
-  for (let k = 0; k < parts.length; k += 2) {
-    let text = parts[k]; let sep = parts[k + 1] || '';
-    if (k === 0) { const m = text.match(/^\n+/); if (m) { lead = m[0]; text = text.slice(m[0].length); } }
-    const t = text.match(/\n+$/); if (t) { text = text.slice(0, -t[0].length); sep = t[0] + sep; }
-    if (text === '') { if (blocks.length) blocks[blocks.length - 1].sep += sep; else lead += sep; continue; }
-    blocks.push({ text, sep });
-  }
-  return { lead, blocks };
-}
-const joinBlocks = (f) => f.lead + f.blocks.map(b => b.text + b.sep).join('');
-
-// ctrl-flavored syntax: one class per line by its first characters, first
-// match wins, the whole line colored (as ctrl does). a numbered paragraph
-// colors its number only, by n mod 7. the line before a rule of dashes is
-// a section header. links are markdown's.
-const SYNTAX = [
-  [/^(#{1,3})\s/, (m) => 'hdr hdr' + m[1].length],
-  [/^-{3,}$/, 'sep'],
-  [/^CP [A-Z]\d{6} \d\d:\d\d/, 'cp'],
-  [/^>/, 'gt'], [/^~/, 'tilde'], [/^\+/, 'plus'], [/^-/, 'dash'], [/^=/, 'eq'], [/^\|/, 'pipe'],
-  [/^\./, 'dot'], [/^,/, 'comma'], [/^\^/, 'caret'], [/^\$/, 'dollar'], [/^@/, 'at'],
-  [/^\//, 'slash'], [/^\\/, 'bslash'], [/^!/, 'bang'],
-  [/^t:/, 'topic'], [/^[a-z]:/i, 'letter'],
-  [/^x+ /, 'done'],
-];
-const NUM = /^(\d+) /;
-const LINK = /\[([^\]]+)\]\(([^)\s]+)\)/g;
-const inline = (s) => esc(s).replace(LINK, (m, t, h) => `<a href="${h}">${t}</a>`);
-
-// sentences, alternately black and red and numbered in a GUTTER, so a
-// paragraph's joints show on a phone. a terminal (. ? !), closed by any
-// quote or bracket and followed by white space or the end of the line, ends
-// a sentence; an ellipsis and e.g./i.e. do not. the count is strict and
-// two-level: it runs through a block's RUN, the plain lines from its start
-// across their hard wraps, and the first sigil line (+, >, a header, a
-// rule...) interrupts it; the rest of that block is plain, and the next
-// block starts a run of its own. the first sentence goes unnumbered.
-const TERM = /[.?!]["')\]]*(?=\s|$)/g;
-const ABBR = /(?:^|[\s(])(?:e\.g|i\.e|etc|vs|cf)$/i;
-const LEAD = /^\s*(?:[>~+\-=|.,^$@\/\\!]|[a-z]:|x+ )?\s*/i;
-const words = (t) => t.match(LEAD)[0].length < t.length; // a word past any sigil
-// a line cut into its sentence pieces [{ t, si }], counting in st
-const cut = (s, st) => {
-  const pieces = []; let at = 0, m;
-  const push = (t) => { pieces.push({ t, si: st.si }); if (words(t)) st.open = true; };
-  TERM.lastIndex = 0;
-  while ((m = TERM.exec(s))) {
-    const i = m.index;
-    if (s[i] === '.' && (s[i - 1] === '.' || ABBR.test(s.slice(0, i)))) continue;
-    const end = i + m[0].length;
-    push(s.slice(at, end)); at = end; st.si++; st.open = false;
-  }
-  if (at < s.length) push(s.slice(at));
-  return pieces;
-};
-// a line's class by its first characters, as SYNTAX says
-const classOf = (line, next) => {
-  let cls = '';
-  for (const [re, c] of SYNTAX) { const m = line.match(re); if (m) { cls = typeof c === 'function' ? c(m) : c; break; } }
-  if (!cls && next !== undefined && /^-{3,}$/.test(next)) cls = 'shdr';
-  return cls;
-};
-// a block: its lines and the gutter. the run is cut into sentences; of a
-// run of two or more, each but the first is numbered once, in the gutter
-// of the first of its lines whose gutter is free (two sentences may begin
-// on one line; the first sentence keeps its line though it shows no
-// number), small and faded, in the sentence's color.
-const blockHtml = (b, i) => {
-  const ls = b.text.split('\n'), st = { si: 0, open: false };
-  let run = true;
-  const lines = ls.map((l, k) => {
-    const n = l.match(NUM), num = n ? n[1] : '', rest = num ? l.slice(num.length) : l;
-    const cls = num ? '' : classOf(l, ls[k + 1]);
-    if (cls) run = false;
-    return { cls, num, pieces: run ? cut(rest, st) : [{ t: rest, si: -1 }] };
-  });
-  const on = new Map(); // sentence -> its lines
-  lines.forEach((ln, k) => ln.pieces.forEach(p => { if (p.si >= 0 && words(p.t)) on.set(p.si, (on.get(p.si) || []).concat(k)); }));
-  const name = new Map(); // line -> the sentence that claims its gutter
-  if (on.size > 1) for (const [si, ks] of [...on].sort((a, b) => a[0] - b[0])) { const k = ks.find(k => !name.has(k)); if (k !== undefined) name.set(k, si); }
-  const shown = (k) => name.has(k) && name.get(k) > 0;
-  const html = lines.map((ln, k) => {
-    const g = shown(k) ? `<span class="g s${name.get(k) % 2}">${name.get(k)}</span>` : '';
-    const num = ln.num ? `<b class="d${parseInt(ln.num, 10) % 7}">${ln.num}</b>` : '';
-    const body = ln.pieces.map(p => p.si < 0 ? inline(p.t) : `<span class="s${p.si % 2}">${inline(p.t)}</span>`).join('');
-    return `<span class="l${ln.cls ? ' ' + ln.cls : ''}">${g}${num}${body}</span>`;
-  }).join('');
-  return `<div class="blk" data-i="${i}">${html}</div>`;
-};
-const blocksHtml = (f) => f.blocks.map(blockHtml).join('\n');
-const view = (f) => ({ blocks: f.blocks.map(b => b.text), html: blocksHtml(f) });
 
 // 📄 conscious file (.md), 🎨 subgene passes style overrides to the frame.
 // on the LAN the blocks are tactile (CONSCIOUS_JS); elsewhere, read only.
@@ -522,4 +541,4 @@ const THREAD_JS = (cpath) => /* js */ `(() => {
   connect();
 })();`;
 
-module.exports = { root, conscious, dream, save, blocksOf, joinBlocks };
+module.exports = { root, conscious, dream, save, blocksOf, joinBlocks, frame, kernel, KERNEL: kernel.toString() };
