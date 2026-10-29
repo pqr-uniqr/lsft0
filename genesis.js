@@ -1,5 +1,5 @@
-// @ts-nocheck vim.js - an L3 expression of a conscious file: the primary's
-// page, driven by a keyboard with vim's bindings.
+// @ts-nocheck genesis.js - the L3 expression of GENESIS.md, the one file it
+// edits: the primary's page, driven by a keyboard with vim's bindings.
 //
 // every file has layers of representations down the substrate: the plain
 // path is the interface, the primary representation; /_/path is L1, the
@@ -13,15 +13,21 @@
 // mycelium already threads the underscores: a request at L3 reads its
 // genes from /_/_/_/_/.node and /_/_/_/_/vvill/.node (the substrate of the
 // substrate), and its interface file is still /vvill/GENESIS.md. so this
-// expression is two gene lines there, and this module.
+// expression is two gene lines there, scoped to GENESIS.md alone (L3 is
+// for precisely scoped genes, and one shaped to this file would err on
+// another), and this module.
 //
 // the page is the primary's (VvilL.js's frame and KERNEL render the same
-// blocks, in the same colors, sentences numbered in the gutter), with a
-// buffer and a cursor of its own: every blank line drawn so the cursor can
-// rest on it, a caret, a hidden textbox holding the keyboard, a status
-// line. the kernel is stringified into the page, so a block re-renders as
-// it is typed, by the one renderer. links are left as written, so the
-// columns match the file's.
+// blocks, sentences numbered in the gutter), with a buffer and a cursor of
+// its own: every blank line drawn so the cursor can rest on it, a caret, a
+// hidden textbox holding the keyboard, a status line. the kernel is
+// stringified into the page, so a block re-renders as it is typed, by the
+// one renderer. links are left as written, so the columns match the
+// file's. the dress is Pete's editor's, not the harness's: the Ctrl Custom
+// theme's purple page and orange ink (the other sentence blue, > lines
+// ctrl's green), his red cursor and selection and yellow matches, and the
+// Ac437 Nix8810 M16 font at his size, leading and tracking, served from
+// /_fonts. one scheme in either device mode.
 //
 // what vim does here: motions (h j k l w b e W B E ge 0 ^ $ | gg G { }
 // ( ) f F t T ; , % n N * #, counts), operators d c y and gq (the reflow,
@@ -31,13 +37,14 @@
 // i< a<; x X s S C D Y J p P r ~ u ^R and . ; v V with d c y J ~ u U p r gq
 // : and o; i a I A o O, insert's ^W ^U, text breaking at the width as it
 // is typed (never a line already past it); z z/t/b, ^D ^U ^F ^B ^E ^Y,
-// PageDown and PageUp a third of a page, every scroll a glide; / ? with
-// n N (smartcase), :s/pat/rep/g over ranges (% N,M . $ '<,'>),
+// PageDown and PageUp a third of a page, every scroll a glide; a ruler
+// after the last column of the width; / ? searching as the pattern is
+// typed, every match lit until :noh, n N (smartcase), :s/pat/rep/g over
+// ranges (% N,M . $ '<,'>),
 // :N, :w (and ⌘S), :q :q! :wq :x ZZ ZQ (q leaves for the interface path),
-// :e :e!, :set tw=N, :theme (dark mode on or off, as the primary's first
-// block does), :help. the unnamed register also goes to the clipboard;
-// a paste (⌘V) in normal mode puts. a click places the cursor; a drag
-// still selects.
+// :e :e!, :set tw=N, :help. the unnamed register also goes to the
+// clipboard; a paste (⌘V) in normal mode puts. a click places the
+// cursor; a drag still selects.
 //
 // :w posts the whole file to /_/_/_/vvill/.save (the 📮 gene), which
 // writes it only if the file still holds what the page loaded (else 409,
@@ -47,6 +54,7 @@
 const log = require('./log.js').init(__filename, '⌨️', '32', 1);
 const V = require('./atmosphere').register('VvilL.js');
 const TW = 55; // the Lore's hard wrap
+const FILE = '/vvill/GENESIS.md'; // the one file this editor is for
 
 // the path's segments: substrate underscores as they are, the directories
 // linked at the interface, the file last
@@ -61,7 +69,7 @@ const crumb = (cpath, ipath) => {
   return `<p class="vvill-crumb">/${parts.join('/')}</p>`;
 };
 
-// 📄 a conscious file as vim. off the LAN, the primary's blocks, read only.
+// 📄 GENESIS.md as vim. off the LAN, the primary's blocks, read only.
 function conscious(xface, subgenes, petri) {
   const { cpath, ipath } = petri.pathology;
   const raw = xface.file.toString('utf8');
@@ -73,11 +81,11 @@ function conscious(xface, subgenes, petri) {
   const local = petri.pathology.spore.isLocal();
   const esc = K.esc;
   const body = `<div id="vwrap"><div class="vvill-conscious vim" id="conscious" data-path="${esc(ipath)}" data-save="${esc(cpath.replace(/\/[^/]*$/, '') + '/.save')}" data-tw="${TW}">${K.blocksHtml(f)}</div>`
-    + `<div id="caret" class="normal"></div><div id="vsel"></div><textarea id="vin" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"></textarea></div>`
+    + `<div id="vline"></div><div id="ruler"></div><div id="vhl"></div><div id="caret" class="normal"></div><div id="vsel"></div><textarea id="vin" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"></textarea></div>`
     + `<div class="vim-stat"><span id="vmode"></span><span id="vpos"></span></div>`;
   const script = local ? `<script type="application/json" id="text">${JSON.stringify(raw).replace(/</g, '\\u003c')}</script>`
     + `<script>const K = (${V.KERNEL})({ links: false });\n${VIM_JS}</script>` : '';
-  return V.frame(crumb(cpath, ipath) + body + script, { title: 'vim ' + ipath.split('/').pop(), styles, noZoom: local, head: `<style>${VIM_CSS}</style>` });
+  return V.frame(crumb(cpath, ipath) + body + script, { title: 'vim ' + ipath.split('/').pop(), styles: { ...DRESS, ...styles }, noZoom: local, head: `<style>${VIM_CSS}</style>` });
 }
 
 // 📮 save: the whole file, written only if it still holds what the page
@@ -87,8 +95,7 @@ async function save(body, petri) {
   if (!petri.pathology.spore.isLocal()) return json(403, { ok: false, reason: 'not local' });
   let q; try { q = JSON.parse(body); } catch (e) { return json(400, { ok: false, reason: 'not json' }); }
   const { path, was, now } = q;
-  if (typeof path !== 'string' || !/^\/vvill(\/[^/]+)*\.md$/.test(path) || path.split('/').includes('..'))
-    return json(400, { ok: false, reason: 'not a conscious file under /vvill' });
+  if (path !== FILE) return json(400, { ok: false, reason: 'not ' + FILE });
   if (!(await petri.zone.if(path))) return json(404, { ok: false, reason: 'no such file' });
   const raw = await petri.zone.rd8(path);
   if (typeof was !== 'string' || raw !== was) return json(409, { ok: false, reason: 'the file changed on disk since the page loaded', text: raw });
@@ -98,28 +105,50 @@ async function save(body, petri) {
   return json(200, { ok: true });
 }
 
-// the editor's dress over the primary's: no margin between blocks (the
-// blank lines are drawn), the caret, the selection, the status line
+// the editor's dress, Pete's editor's: the Ctrl Custom theme's page and
+// ink (the other sentence blue; ctrl's syntax in its own colors, the >
+// lines its green), the cursor, selection and match colors of his
+// settings, and the Ac437 Nix8810 M16 font, served from /_fonts, at his
+// 13px, 0.82 leading and 0.5px tracking, the pane 56 columns wide and
+// centered. one scheme in either device
+// mode: the frame's dark rules are outranked by :root[data-theme] and the
+// ids. the overlays (the current line, the ruler, the selection, the
+// matches) paint behind the text as an editor's do; the caret blends in
+// difference, a red block with its glyph inverted.
+const FONT = `'Ac437 Nix8810 M16', 'Courier New', monospace`;
+const DRESS = { bgColor: '#2d0549', textColor: '#ef4811', fontFamily: FONT };
+const INK = { s1: '#6796e6', hdr: '#ffddfa', sep: '#ffddfa', shdr: '#ffddfa', gt: '#009400', tilde: '#ff0000',
+  d0: '#ff0000', d1: '#ff8000', d2: '#ffff00', d3: '#00ff00', d4: '#0080ff', d5: '#0000ff', d6: '#8000ff',
+  plus: '#5fafaf', dash: '#ff87d7', eq: '#fffff0', pipe: '#39ff14', dot: '#ff00ff', comma: '#fff', caret: '#ff8700',
+  dollar: '#ffd700', at: '#888', slash: '#fff', bang: '#00bfff', topic: '#808080', done: '#777', cp: '#5fd7ff' };
 const VIM_CSS = /* css */ `
-  .vim .blk { margin: 0; }
-  #vwrap { position: relative; }
-  #caret { position: absolute; pointer-events: none; background: rgba(0, 0, 0, 0.35); }
-  #caret.insert { background: #000; }
-  #vsel div { position: absolute; pointer-events: none; background: rgba(40, 110, 255, 0.22); }
+  @font-face { font-family: 'Ac437 Nix8810 M16'; src: url('/_fonts/Ac437_Nix8810_M16.ttf') format('truetype'); }
+  :root, :root[data-theme] { color-scheme: dark; }
+  :root a, :root[data-theme] a { color: #d9baff; }
+  :root .vvill-bar, :root[data-theme] .vvill-bar { border-color: #5a2a7a; }
+  .vvill-bar a { font-weight: normal; }
+  .vvill-bar { font-size: 13px; letter-spacing: 0.5px; }
+  main { font-size: 13px; letter-spacing: 0.5px; max-width: calc(56ch + 28px); }
+  #conscious { font-family: ${FONT}; font-size: 13px; line-height: 0.82; letter-spacing: 0.5px; }
+  #conscious, #conscious * { font-weight: normal; }
+  #conscious .blk { margin: 0; }
+  #conscious .l { min-height: 0.82em; }
+  #conscious .g { font-size: 1em; line-height: inherit; }
+  #conscious .hdr1, #conscious .hdr2, #conscious .hdr3, #conscious .cp { font-size: 1em; }
+  #conscious .bslash { color: #000; background: rgba(255, 255, 255, 0.28); }
+  ${Object.entries(INK).map(([c, v]) => `#conscious .${c} { color: ${v}; }`).join('\n  ')}
+  #vwrap { position: relative; isolation: isolate; }
+  #vline, #ruler, #vsel div, #vhl div { position: absolute; pointer-events: none; z-index: -1; }
+  #vline { left: -16px; right: -16px; background: #241530; }
+  #ruler { top: 0; bottom: 0; width: 0; border-left: 1px solid #ff0000; }
+  #vsel div { background: #ff0000; }
+  #vhl div { background: #ffff00; }
+  #caret { position: absolute; pointer-events: none; background: #ff0000; mix-blend-mode: difference; }
+  #caret.insert { mix-blend-mode: normal; }
   #vin { position: absolute; width: 1px; opacity: 0; border: 0; padding: 0; margin: 0; resize: none; outline: 0; font: inherit; overflow: hidden; }
   .vim-stat { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; gap: 1em; padding: 4px 16px;
-    border-top: 1px solid #000; background: #fff; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 14px; line-height: 20px; white-space: pre; overflow: hidden; }
-  .vim-stat #vpos { color: #666; flex: none; }
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) #caret { background: rgba(255, 255, 255, 0.45); }
-    :root:not([data-theme="light"]) #caret.insert { background: #fff; }
-    :root:not([data-theme="light"]) .vim-stat { background: #000; border-color: #fff; }
-    :root:not([data-theme="light"]) .vim-stat #vpos { color: #aaa; }
-  }
-  :root[data-theme="dark"] #caret { background: rgba(255, 255, 255, 0.45); }
-  :root[data-theme="dark"] #caret.insert { background: #fff; }
-  :root[data-theme="dark"] .vim-stat { background: #000; border-color: #fff; }
-  :root[data-theme="dark"] .vim-stat #vpos { color: #aaa; }
+    border-top: 1px solid #5a2a7a; background: #2d0549; color: #ebebeb; font-family: ${FONT}; font-size: 13px; line-height: 20px; letter-spacing: 0.5px; white-space: pre; overflow: hidden; }
+  .vim-stat #vpos { color: #747478; flex: none; }
 `;
 
 // ⌨️ the editor. one string, the buffer; one offset, the cursor; a key
@@ -131,7 +160,7 @@ const VIM_JS = String.raw`(() => {
   // textbox that holds the keyboard, and a status line. the buffer is one
   // string; the cursor an offset into it; lines are found by their starts.
   const wrap = document.getElementById('vwrap'), root = document.getElementById('conscious'),
-    path = root.dataset.path, caret = document.getElementById('caret'), selbox = document.getElementById('vsel'),
+    path = root.dataset.path, caret = document.getElementById('caret'), selbox = document.getElementById('vsel'), ruler = document.getElementById('ruler'), vline = document.getElementById('vline'), hlbox = document.getElementById('vhl'),
     ta = document.getElementById('vin'), left = document.getElementById('vmode'), right = document.getElementById('vpos');
   const raw = JSON.parse(document.getElementById('text').textContent);
   const eol = raw.endsWith('\n');
@@ -153,6 +182,7 @@ const VIM_JS = String.raw`(() => {
   let reg = { text: '', line: false };
   let undos = [], redos = [], last = null, rec = [], replaying = false;
   let lastSearch = null, lastFind = null;
+  let hl = null, hlCache = { text: null, re: null, list: [] }, cmdFrom = 0;
   let prev = null, lineEl = [];
   index();
 
@@ -203,7 +233,9 @@ const VIM_JS = String.raw`(() => {
   };
   let cw = 8, lh = 20;
   const measure = () => { const s = document.createElement('span'); s.textContent = '0000000000'; s.style.cssText = 'position:absolute;visibility:hidden;white-space:pre';
-    root.appendChild(s); cw = s.getBoundingClientRect().width / 10; s.remove(); lh = (lineEl[0] && lineEl[0].getBoundingClientRect().height) || parseFloat(getComputedStyle(root).fontSize) * 1.45 || 20; };
+    root.appendChild(s); cw = s.getBoundingClientRect().width / 10; s.remove(); lh = (lineEl[0] && lineEl[0].getBoundingClientRect().height) || parseFloat(getComputedStyle(root).fontSize) * 1.45 || 20; rule(); };
+  // the ruler: a hairline after the last column of the width
+  const rule = () => { const l0 = lineEl[0] || root; ruler.style.left = (l0.getBoundingClientRect().left - wrap.getBoundingClientRect().left + tw * cw) + 'px'; };
 
   // ---- the view: every scroll is one eased glide toward an aim, so a key
   // pressed mid-glide reckons from where the view is heading, not where it is;
@@ -221,19 +253,21 @@ const VIM_JS = String.raw`(() => {
     window.scrollTo(0, was + d * k); if (scrollY === was) { aim = null; frame = 0; return; } frame = requestAnimationFrame(step); };
   const settle = () => { if (frame) cancelAnimationFrame(frame); frame = 0; aim = null; };
   addEventListener('wheel', settle, { passive: true }); addEventListener('touchstart', settle, { passive: true });
+  addEventListener('scroll', () => { if (hl) hilite(); }, { passive: true });
 
   // the caret, drawn: a block in normal mode, a bar in insert
   function place() {
     const r = rectOf(cur); if (!r) return;
     const w = wrap.getBoundingClientRect();
-    const x = r.left - w.left, y = r.top - w.top, h = r.height || lh;
+    const x = r.left - w.left, h = r.height || lh, y = r.top - w.top + (h - lh) / 2; // the line box, not the glyph's
     caret.className = mode;
-    caret.style.left = x + 'px'; caret.style.top = y + 'px'; caret.style.height = h + 'px';
+    caret.style.left = x + 'px'; caret.style.top = y + 'px'; caret.style.height = lh + 'px';
     caret.style.width = (mode === 'insert' ? 2 : (r.width || cw)) + 'px';
-    ta.style.left = x + 'px'; ta.style.top = y + 'px'; ta.style.height = h + 'px';
+    vline.style.top = y + 'px'; vline.style.height = lh + 'px';
+    ta.style.left = x + 'px'; ta.style.top = y + 'px'; ta.style.height = lh + 'px';
     const top = r.top + scrollY, bot = top + h, vt = viewTop();
     if (top < vt + pad()) glide(top < 2 * pad() ? 0 : top - pad()); else if (bot > vt + viewH() - pad()) glide(bot - viewH() + pad());
-    selection(); status();
+    selection(); hilite(); status();
   }
   const selRange = () => {
     if (mode === 'visual') { const a = Math.min(anchor, cur), b = Math.max(anchor, cur); return { a, b: Math.min(N(), b + 1), lw: false }; }
@@ -254,7 +288,27 @@ const VIM_JS = String.raw`(() => {
       for (const b of r.getClientRects()) if (b.width > 0) rects.push(b);
     }
     for (const b of rects) { const d = document.createElement('div');
-      d.style.cssText = 'left:' + (b.left - w.left) + 'px;top:' + (b.top - w.top) + 'px;width:' + b.width + 'px;height:' + b.height + 'px'; selbox.appendChild(d); }
+      d.style.cssText = 'left:' + (b.left - w.left) + 'px;top:' + (b.top - w.top + (b.height - lh) / 2) + 'px;width:' + b.width + 'px;height:' + lh + 'px'; selbox.appendChild(d); }
+  }
+  // every match of the lit pattern, drawn for the lines near the view;
+  // the matches are found once per text, the boxes with each move
+  function hilite() {
+    hlbox.innerHTML = '';
+    if (!hl) return;
+    if (hlCache.text !== text || hlCache.re !== hl.re) { const list = [], re = hl.re; re.lastIndex = 0; let m;
+      while ((m = re.exec(text)) && list.length < 20000) { if (m[0] === '') { re.lastIndex++; continue; } list.push([m.index, m.index + m[0].length]); }
+      hlCache = { text, re, list }; }
+    const w = wrap.getBoundingClientRect(), boxes = new Map();
+    const near = (l) => { let b = boxes.get(l); if (!b) { b = lineEl[l].getBoundingClientRect(); boxes.set(l, b); } return b.bottom > -innerHeight && b.top < 2 * innerHeight; };
+    for (const [a, b] of hlCache.list) {
+      const la = lineOf(a), lb = lineOf(Math.max(a, b - 1));
+      for (let l = la; l <= lb; l++) { if (!near(l)) continue;
+        const from = l === la ? a - starts[l] : 0, to = l === lb ? b - starts[l] : lineEnd(l) - starts[l]; if (to <= from) continue;
+        const p = nodeAt(l, from), q = nodeAt(l, to); if (!p || p.empty || !q) continue;
+        const r = document.createRange(); r.setStart(p.node, p.off); r.setEnd(q.node, q.off);
+        for (const c of r.getClientRects()) if (c.width > 0) { const d = document.createElement('div');
+          d.style.cssText = 'left:' + (c.left - w.left) + 'px;top:' + (c.top - w.top + (c.height - lh) / 2) + 'px;width:' + c.width + 'px;height:' + lh + 'px'; hlbox.appendChild(d); } }
+    }
   }
   function status() {
     const p = path.split('/').pop();
@@ -349,9 +403,9 @@ const VIM_JS = String.raw`(() => {
       case ';': case ',': { if (!lastFind) return null; let kind = lastFind.kind;
         if (k === ',') kind = { f: 'F', F: 'f', t: 'T', T: 't' }[kind]; const p = findIn(o, lastFind.ch, kind, n); return p === null ? null : { o: p, inc: kind === 'f' || kind === 't', i: i + 1 }; }
       case 'n': case 'N': { if (!lastSearch) { say('E35: No previous regular expression'); return null; }
-        const r = search(o, (k === 'N') !== lastSearch.back, lastSearch.re); return r ? { o: r.o, i: i + 1 } : (say('E486: Pattern not found: ' + lastSearch.src), null); }
+        hl = { re: lastSearch.re, src: lastSearch.src }; const r = search(o, (k === 'N') !== lastSearch.back, lastSearch.re); return r ? { o: r.o, i: i + 1 } : (say('E486: Pattern not found: ' + lastSearch.src), null); }
       case '*': case '#': { const w = wordAt(o); if (!w) return null; lastSearch = { re: new RegExp('\\b' + esc(w) + '\\b', 'g'), back: k === '#', src: w };
-        const r = search(o, k === '#', lastSearch.re); return r ? { o: r.o, i: i + 1 } : null; }
+        hl = { re: lastSearch.re, src: lastSearch.src }; const r = search(o, k === '#', lastSearch.re); return r ? { o: r.o, i: i + 1 } : null; }
       case '%': { let p = o; const s = line(l); let c = o - starts[l]; while (c < s.length && !PAIRS[s[c]]) c++; if (c >= s.length) return null;
         const m = matchPair(starts[l] + c); return m === null ? null : { o: m, inc: true, i: i + 1 }; }
     }
@@ -571,15 +625,29 @@ const VIM_JS = String.raw`(() => {
 
   // ---- the command line: : / ?
   let cmdRange = null;
-  function enterCmd(prefix, sp) { mode = 'cmd'; cmd = prefix; cmdRange = sp || null; msg = ''; status(); }
+  function enterCmd(prefix, sp) { mode = 'cmd'; cmd = prefix; cmdRange = sp || null; cmdFrom = cur; msg = ''; status(); }
   function cmdKey(k) {
-    if (k === '<Esc>' || k === '<C-[>' || k === '<C-c>') { mode = 'normal'; cmd = ''; status(); return; }
-    if (k === '<BS>') { if (cmd.length <= 1) { mode = 'normal'; cmd = ''; status(); return; } cmd = cmd.slice(0, -1); status(); return; }
-    if (k === '<C-u>') { cmd = cmd[0]; status(); return; }
-    if (k === '<CR>') { const c = cmd; mode = 'normal'; cmd = ''; if (c[0] === ':') ex(c.slice(1)); else find(c[0] === '?', c.slice(1)); status(); return; }
-    if (k.length === 1) { cmd += k; status(); }
+    const live = cmd[0] === '/' || cmd[0] === '?';
+    const back = () => { mode = 'normal'; cmd = ''; if (live) { cur = cmdFrom; want = col(cur); hl = null; place(); } status(); };
+    if (k === '<Esc>' || k === '<C-[>' || k === '<C-c>') { back(); return; }
+    if (k === '<BS>') { if (cmd.length <= 1) { back(); return; } cmd = cmd.slice(0, -1); }
+    else if (k === '<C-u>') cmd = cmd[0];
+    else if (k === '<CR>') { const c = cmd; mode = 'normal'; cmd = '';
+      if (c[0] === ':') ex(c.slice(1)); else { cur = cmdFrom; find(c[0] === '?', c.slice(1)); hl = lastSearch ? { re: lastSearch.re, src: lastSearch.src } : null; hilite(); }
+      status(); return; }
+    else if (k.length === 1) cmd += k;
+    else return;
+    if (live) incsearch(); status();
   }
-  const regex = (src, extra) => { try { return new RegExp(src, 'g' + (/[A-Z]/.test(src) ? '' : 'i') + (extra || '')); } catch (e) { say('E: ' + e.message); return null; } };
+  // the search as it is typed: the view goes to the first match, every match lit
+  function incsearch() {
+    const src = cmd.slice(1), re = src && compile(src), m0 = msg;
+    hl = re instanceof RegExp ? { re, src } : null;
+    const r = hl && search(cmdFrom, cmd[0] === '?', re); msg = m0;
+    cur = r ? clampNormal(r.o) : cmdFrom; want = col(cur); place();
+  }
+  const compile = (src, extra) => { try { return new RegExp(src, 'g' + (/[A-Z]/.test(src) ? '' : 'i') + (extra || '')); } catch (e) { return e; } };
+  const regex = (src, extra) => { const r = compile(src, extra); if (r instanceof RegExp) return r; say('E: ' + r.message); return null; };
   function find(back, src) {
     if (src) { const re = regex(src); if (!re) return; lastSearch = { re, back, src }; }
     if (!lastSearch) return;
@@ -628,21 +696,13 @@ const VIM_JS = String.raw`(() => {
       case 'q!': leaveTo(); return;
       case 'e': if (modified()) { say('E37: No write since last change (add ! to override)'); return; } window.onbeforeunload = null; location.reload(); return;
       case 'e!': window.onbeforeunload = null; location.reload(); return;
-      case 'theme': theme(); return;
-      case 'noh': case 'nohlsearch': return;
+      case 'noh': case 'nohlsearch': hl = null; hilite(); return;
       case 'set tw?': case 'set textwidth?': say('  textwidth=' + tw); return;
-      case 'help': say('vim.js: motions, operators d c y gq, objects, v V, u ^R ., / n *, :w :q :s :N :set tw= :theme'); return;
+      case 'help': say('genesis.js: motions, operators d c y gq, objects, v V, u ^R ., / n *, :w :q :s :N :noh :set tw='); return;
     }
-    if ((m = c.match(/^set\s+(tw|textwidth)=(\d+)$/))) { tw = +m[2]; say('  textwidth=' + tw); return; }
+    if ((m = c.match(/^set\s+(tw|textwidth)=(\d+)$/))) { tw = +m[2]; rule(); say('  textwidth=' + tw); return; }
     if (c === '') return;
     say('E492: Not an editor command: ' + c);
-  }
-  function theme() {
-    const html = document.documentElement, sys = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    const now = html.dataset.theme || sys, want = now === 'dark' ? 'light' : 'dark';
-    try { if (want === sys) { delete html.dataset.theme; localStorage.removeItem('vvill-theme'); } else { html.dataset.theme = want; localStorage.setItem('vvill-theme', want); } }
-    catch (x) { html.dataset.theme = want; }
-    say(want === sys ? want + ', with the device' : want + ', pinned'); place();
   }
 
   // ---- the keyboard
@@ -693,6 +753,8 @@ const VIM_JS = String.raw`(() => {
   window.onbeforeunload = (e) => { if (modified()) { e.preventDefault(); e.returnValue = ''; } };
 
   render(); measure(); cur = clampNormal(0); place(); ta.focus({ preventScroll: true });
+  // the font arrives after the first layout: measure again in it
+  if (document.fonts) { const fit = () => { measure(); place(); }; document.fonts.ready.then(fit); document.fonts.addEventListener('loadingdone', fit); }
   // a handle for scripts: send('dwihello<Esc>') types as vim reads it
   const KEYS = { '<Esc>': 'Escape', '<CR>': 'Enter', '<BS>': 'Backspace', '<Tab>': 'Tab', '<Del>': 'Delete', '<Left>': 'ArrowLeft', '<Right>': 'ArrowRight', '<Up>': 'ArrowUp', '<Down>': 'ArrowDown', '<PageDown>': 'PageDown', '<PageUp>': 'PageUp' };
   window.vim = { get text() { return text; }, get cur() { return cur; }, get mode() { return mode; }, get reg() { return reg; }, get msg() { return msg; },

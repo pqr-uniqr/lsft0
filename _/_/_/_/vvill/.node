@@ -1,2 +1,2 @@
-📄vim.js::conscious(🎨) .*\.md$
-📮/.save vim.js::save
+📄genesis.js::conscious(🎨) ^GENESIS\.md$
+📮/.save genesis.js::save
