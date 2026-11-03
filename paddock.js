@@ -216,7 +216,7 @@ function sweep(p, stall) {
     fs.mkdirSync(join(dir, 'script'), { recursive: true });
     fs.copyFileSync(s.src, join(ATTEMPTS, `${a}.jsonl`));
     for (const c of new Set([s.comp, companion(s.id)])) if (fs.existsSync(c)) fs.cpSync(c, dir, { recursive: true });
-    for (const f of fs.readdirSync(home)) if (f.endsWith('.md')) fs.copyFileSync(join(home, f), join(dir, 'script', f));
+    for (const f of fs.readdirSync(home)) if (/\.(md|txt)$/.test(f)) fs.copyFileSync(join(home, f), join(dir, 'script', f));
     if (fs.existsSync(MEMORY)) fs.cpSync(MEMORY, join(dir, 'memory'), { recursive: true });
     const raw = fs.readFileSync(s.src, 'utf8'); const verdicts = verdictsOf(raw);
     const verdict = verdicts.length ? verdicts[verdicts.length - 1] : null; // the last said, as the page shows it

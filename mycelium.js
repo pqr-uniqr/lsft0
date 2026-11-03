@@ -211,6 +211,7 @@ class Strain {
             case 'js': ctype = 'application/javascript'; break;
             case 'json': ctype = 'application/json'; break;
             case 'md': ctype = 'text/plain; charset=utf-8'; break;
+            case 'txt': ctype = 'text/plain; charset=utf-8'; break;
             case 'ttf': ctype = 'font/ttf'; break;
             case 'woff': ctype = 'font/woff'; break;
             case 'woff2': ctype = 'font/woff2'; break;

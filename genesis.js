@@ -1,4 +1,4 @@
-// @ts-nocheck genesis.js - the L3 expression of GENESIS.md, the one file it
+// @ts-nocheck genesis.js - the L3 expression of GENESIS.txt, the one file it
 // edits: the primary's page, driven by a keyboard with vim's bindings.
 //
 // every file has layers of representations down the substrate: the plain
@@ -8,12 +8,12 @@
 // file system over HTTP; from /_/_/_/path (L3) down the layers are open: a
 // scratch space for expressions that may become primary, and a closet of
 // improvised alternative representations. this is one such, the first:
-// http://vostok.local:8880/_/_/_/vvill/GENESIS.md
+// http://vostok.local:8880/_/_/_/vvill/GENESIS.txt
 //
 // mycelium already threads the underscores: a request at L3 reads its
 // genes from /_/_/_/_/.node and /_/_/_/_/vvill/.node (the substrate of the
-// substrate), and its interface file is still /vvill/GENESIS.md. so this
-// expression is two gene lines there, scoped to GENESIS.md alone (L3 is
+// substrate), and its interface file is still /vvill/GENESIS.txt. so this
+// expression is two gene lines there, scoped to GENESIS.txt alone (L3 is
 // for precisely scoped genes, and one shaped to this file would err on
 // another), and this module.
 //
@@ -55,7 +55,7 @@
 const log = require('./log.js').init(__filename, '⌨️', '32', 1);
 const V = require('./atmosphere').register('VvilL.js');
 const TW = 55; // the Lore's hard wrap
-const FILE = '/vvill/GENESIS.md'; // the one file this editor is for
+const FILE = '/vvill/GENESIS.txt'; // the one file this editor is for
 
 // the path's segments: substrate underscores as they are, the directories
 // linked at the interface, the file last
@@ -70,7 +70,7 @@ const crumb = (cpath, ipath) => {
   return `<p class="vvill-crumb">/${parts.join('/')}</p>`;
 };
 
-// 📄 GENESIS.md as vim. off the LAN, the primary's blocks, read only.
+// 📄 GENESIS.txt as vim. off the LAN, the primary's blocks, read only.
 function conscious(xface, subgenes, petri) {
   const { cpath, ipath } = petri.pathology;
   const raw = xface.file.toString('utf8');
