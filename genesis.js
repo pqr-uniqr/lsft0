@@ -37,11 +37,12 @@
 // i< a<; x X s S C D Y J p P r ~ u ^R and . ; v V with d c y J ~ u U p r gq
 // : and o; i a I A o O, insert's ^W ^U, text breaking at the width as it
 // is typed (never a line already past it); z z/t/b, ^D ^U ^F ^B ^E ^Y,
-// PageDown and PageUp a third of a page, every scroll a glide; a ruler
+// PageDown and PageUp five lines (times a count), every scroll a glide; a ruler
 // after the last column of the width; / ? searching as the pattern is
 // typed, every match lit until :noh, n N (smartcase), :s/pat/rep/g over
 // ranges (% N,M . $ '<,'>),
-// :N, :w (and ⌘S), :q :q! :wq :x ZZ ZQ (q leaves for the interface path),
+// :N, :w (and ⌘S, and ,w), :q :q! :wq :x ZZ ZQ (q leaves for the interface
+// path),
 // :e :e!, :set tw=N, :help. the unnamed register also goes to the
 // clipboard; a paste (⌘V) in normal mode puts. a click places the
 // cursor; a drag still selects.
@@ -178,7 +179,7 @@ const VIM_JS = String.raw`(() => {
   const firstNb = (l) => { const s = line(l), m = s.match(/\S/); return starts[l] + (m ? m.index : Math.max(0, s.length - 1)); };
   // the cursor, and the column it wants back after j and k
   let cur = 0, want = 0;
-  let mode = 'normal', keys = [], anchor = 0, cmd = '', msg = '';
+  let mode = 'normal', keys = [], anchor = 0, cmd = '', msg = '', commaTimer = 0;
   let reg = { text: '', line: false };
   let undos = [], redos = [], last = null, rec = [], replaying = false;
   let lastSearch = null, lastFind = null;
@@ -594,11 +595,19 @@ const VIM_JS = String.raw`(() => {
       case 'z': { if (t[i + 1] === undefined) return 'wait'; const r = rectOf(cur); if (!r) return true; const y = r.top + scrollY, h = r.height || lh;
         if (t[i + 1] === 'z') glide(y + h / 2 - viewH() / 2); else if (t[i + 1] === 't') glide(y < 2 * pad() ? 0 : y - pad()); else if (t[i + 1] === 'b') glide(y + h - viewH() + pad()); place(); return true; }
       case '<C-d>': case '<C-u>': case '<C-f>': case '<C-b>': case '<PageDown>': case '<PageUp>': { const page = Math.max(1, Math.floor((innerHeight - 40) / lh));
-        const d = Math.max(1, (k === '<C-d>' || k === '<C-u>') ? Math.floor(page / 2) : (k === '<PageDown>' || k === '<PageUp>') ? Math.floor(page / 3) : page - 2);
+        const d = Math.max(1, (k === '<C-d>' || k === '<C-u>') ? Math.floor(page / 2) : (k === '<PageDown>' || k === '<PageUp>') ? 5 * n : page - 2);
         const dir = (k === '<C-d>' || k === '<C-f>' || k === '<PageDown>') ? 1 : -1; glide(viewTop() + dir * d * lh); const l = Math.max(0, Math.min(lastLine(), lineOf(cur) + dir * d)); cur = at(l, want); cur = clampNormal(cur); place(); return true; }
       case '<C-e>': case '<C-y>': { glide(viewTop() + (k === '<C-e>' ? n : -n) * lh); let l = lineOf(cur);
         while (l < lastLine() && lineY(l).top < viewTop() + pad()) l++; while (l > 0 && lineY(l).bot > viewTop() + viewH() - pad()) l--;
         if (l !== lineOf(cur)) cur = clampNormal(at(l, want)); place(); return true; }
+      // ,w writes (Pete's shortcut). a lone , waits a second for the w, then
+      // is the motion (the reverse of ;); any other key after it is the
+      // motion and then that key, as if typed apart
+      case ',': { if (vis) break;
+        if (t[i + 1] === undefined) { const snap = t.join(' '); clearTimeout(commaTimer);
+          commaTimer = setTimeout(() => { if (keys.join(' ') !== snap) return; keys = []; const m = motion(t, i, { n: c1, op: false }); if (m && m !== 'wait') move(m); status(); }, 1000); return 'wait'; }
+        if (t[i + 1] === 'w') { ex('w'); return true; }
+        const m = motion(t, i, { n: c1, op: false }); if (m && m !== 'wait') move(m); return run(keys = t.slice(i + 1)); }
       case 'Z': { if (t[i + 1] === undefined) return 'wait'; if (t[i + 1] === 'Z') ex('x'); else if (t[i + 1] === 'Q') ex('q!'); return true; }
       case '<Esc>': case '<C-[>': case '<C-c>': return true;
     }
@@ -698,7 +707,7 @@ const VIM_JS = String.raw`(() => {
       case 'e!': window.onbeforeunload = null; location.reload(); return;
       case 'noh': case 'nohlsearch': hl = null; hilite(); return;
       case 'set tw?': case 'set textwidth?': say('  textwidth=' + tw); return;
-      case 'help': say('genesis.js: motions, operators d c y gq, objects, v V, u ^R ., / n *, :w :q :s :N :noh :set tw='); return;
+      case 'help': say('genesis.js: motions, operators d c y gq, objects, v V, u ^R ., / n *, :w ,w :q :s :N :noh :set tw='); return;
     }
     if ((m = c.match(/^set\s+(tw|textwidth)=(\d+)$/))) { tw = +m[2]; rule(); say('  textwidth=' + tw); return; }
     if (c === '') return;
