@@ -4,15 +4,19 @@
 // harness's (VvilL.js). the first view is the page as it has been, white,
 // the sentences black and red. the model and the views are stringified
 // into the page, where the reader rebuilds the model from the text and
-// keeps it, with the views and a re-render, under window.genesis: the
-// ground for what comes next (loop headers always in view, a corner that
-// says the loop, layer and sentence in view, the flash readers). the loop
+// keeps it, with the views and a re-render, under window.genesis, the
+// ground the page's other modules stand on: the flash readers
+// (genesis.flash.js), shipped after it. the loop
 // headers stand in the body's style; the harness's bar, VvilL at its left,
-// sticks to the top and, once a loop's header has scrolled under it, says
-// the loop at its center, large, bold italic, number and name (0:
-// Reincarnation), and under it, bold, the layer whose body has scrolled
-// under it (Layer 4), in the number's own color from the body; and under
-// the logo, the document's name, GENESIS, as the title art names it. a tap
+// sticks to the top and, once the first loop's header has scrolled under
+// it, says at its center the loop the page's center holds, large, bold
+// italic, number and name (0: Reincarnation), and under it, bold, the
+// layer the center holds (Layer 4), in the number's own color from the
+// body; and under the logo, the document's name, GENESIS, as the title
+// art names it. before that, at the top, the center says GENESIS in the
+// loop's style. the blocks outside the focus, the layer named (with its
+// notes), or the loop named, are greyed a little; at the top none are.
+// at its right, the flash readers (genesis.flash.js). a tap
 // on the loop there scrolls to the next loop, a tap on the layer to the
 // next layer, the first again after the last. a tap on
 // the title art turns dark mode on or off, as the page has done. reading
@@ -23,6 +27,7 @@ const log = require('./log.js').init(__filename, '📖', '32', 1);
 const V = require('./atmosphere').register('VvilL.js');
 const M = require('./atmosphere').register('genesis.model.js');
 const W = require('./atmosphere').register('genesis.views.js');
+const F = require('./atmosphere').register('genesis.flash.js');
 
 // 📄 GENESIS.txt, read. a 🎨 subgene passes style overrides to the frame.
 function read(xface, subgenes, petri) {
@@ -38,8 +43,9 @@ function read(xface, subgenes, petri) {
     + `<div class="vvill-conscious" id="conscious" data-path="${esc(cpath)}" data-view="${name}">${vs[name].html(doc)}</div>`
     + `<p id="cstatus" class="vvill-status"></p>`
     + `<script type="application/json" id="text">${JSON.stringify(raw).replace(/</g, '\\u003c')}</script>`
-    + `<script>const model = (${M.MODEL}), views = (${W.VIEWS})();\n${READER_JS}</script>`,
-    { title: cpath.split('/').pop(), styles, head: `<style>${READER_CSS}</style>` });
+    + `<script>const model = (${M.MODEL}), views = (${W.VIEWS})();\n${READER_JS}</script>`
+    + `<script>${F.FLASH_JS}</script>`,
+    { title: cpath.split('/').pop(), styles, head: `<style>${READER_CSS}${F.FLASH_CSS}</style>` });
 }
 
 // the bar sticks, in the page's own background (inherit: the body's, in
@@ -52,7 +58,7 @@ const INK = ['#d00000', '#e07000', '#b8a000', '#00a000', '#0070d0', '#0000d0', '
 const INK_DARK = ['#ff0000', '#ff8000', '#ffff00', '#00ff00', '#0080ff', '#0000ff', '#8000ff'];
 const inks = (pre, cols) => cols.map((c, n) => `${pre} .vvill-bar .d${n} { color: ${c}; }`).join('\n  ');
 const READER_CSS = /* css */ `
-  .vvill-bar { position: sticky; top: 0; z-index: 2; background: inherit; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 8px 16px; }
+  .vvill-bar { position: sticky; top: 0; z-index: 2; background: inherit; display: grid; grid-template-columns: 1fr auto 1fr; column-gap: 12px; align-items: center; padding: 8px 16px; }
   .vvill-bar a { grid-area: 1 / 1; }
   .vvill-doc { grid-area: 2 / 1; font-weight: bold; white-space: nowrap; line-height: 1.2; min-height: 1.2em; }
   .vvill-loop { grid-area: 1 / 2; text-align: center; font-size: 1.3em; font-weight: bold; font-style: italic; white-space: nowrap; line-height: 1.15; min-height: 1.15em; }
@@ -62,6 +68,9 @@ const READER_CSS = /* css */ `
   @media (prefers-color-scheme: dark) { ${inks(':root:not([data-theme="light"])', INK_DARK)} }
   ${inks(':root[data-theme="dark"]', INK_DARK)}
   .vvill-conscious .g { opacity: 1; font-weight: bold; } /* the gutter numbers in full color, so they read on a phone */
+  .vvill-conscious .blk { transition: opacity 0.3s; }
+  .vvill-conscious .blk.dim { opacity: 0.5; } /* out of focus */
+  .vvill-conscious.writing .blk.dim { opacity: 1; } /* not while the flash reader writes */
 `;
 
 // the page's script: the model rebuilt from the text, the reader's API,
@@ -70,24 +79,32 @@ const READER_JS = /* js */ `(() => {
   const root = document.getElementById('conscious'), status = document.getElementById('cstatus');
   const doc = model(JSON.parse(document.getElementById('text').textContent));
   const say = (m) => { status.textContent = m; };
-  const render = (name) => { const v = views[name]; if (!v) return false; root.innerHTML = v.html(doc); root.dataset.view = name; els.clear(); inView(); return true; };
-  // the loop and the layer in view: the last loop header, and the last layer
-  // body after it, scrolled under the bar; named there
+  const render = (name) => { const v = views[name]; if (!v) return false; root.innerHTML = v.html(doc); root.dataset.view = name; els.clear(); dimmed = null; inView(); root.dispatchEvent(new Event('genesis:render')); return true; };
+  // the loop and the layer in view: once the first loop header has scrolled
+  // under the bar, the last loop header above the page's center, and the
+  // last layer body after it; named in the bar, and told to the page
   const bar = document.querySelector('.vvill-bar'), head = document.createElement('i'), sub = document.createElement('span'), name = document.createElement('span');
   head.className = 'vvill-loop'; sub.className = 'vvill-layer'; name.className = 'vvill-doc'; bar.append(head, sub, name);
   const els = new Map();
   const el = (b) => { let e = els.get(b.i); if (!e) { e = root.querySelector('.blk[data-i="' + b.i + '"]'); els.set(b.i, e); } return e; };
-  let loop = null, layer = null;
+  let loop = null, layer = null, dimmed = null;
   const inView = () => {
-    const under = bar.getBoundingClientRect().bottom; let l = null, y = null;
-    for (const b of doc.blocks) {
+    const under = bar.getBoundingClientRect().bottom, mid = innerHeight / 2; let l = null, y = null;
+    const first = doc.loops.length ? el(doc.loops[0].head) : null;
+    if (first && first.getBoundingClientRect().top < under) for (const b of doc.blocks) {
       if (b.role !== 'loop' && b.role !== 'body') continue;
-      const e = el(b); if (!e || e.getBoundingClientRect().top >= under) break;
+      const e = el(b); if (!e || e.getBoundingClientRect().top >= mid) break;
       if (b.role === 'loop') { l = b.loop; y = null; } else y = b.layer;
     }
     loop = l === null ? null : doc.loop(l); layer = loop && y !== null ? doc.layer(l, y) : null;
-    head.textContent = loop ? loop.n + ': ' + loop.name : ''; name.textContent = loop ? doc.header.title : '';
+    head.textContent = loop ? loop.n + ': ' + loop.name : doc.header.title; name.textContent = loop ? doc.header.title : '';
     sub.textContent = layer ? 'Layer ' + layer.n : ''; sub.className = 'vvill-layer' + (layer ? ' d' + (layer.n % 7) : '');
+    // the focus: the layer named, with its notes, or the loop named; the rest greyed
+    const key = layer ? 'y' + loop.n + '.' + layer.n : loop ? 'l' + loop.n : 'doc';
+    if (key !== dimmed) { dimmed = key;
+      const focus = new Set((layer ? layer.blocks : loop ? [loop.head, ...loop.lead, ...loop.layers.flatMap(z => z.blocks)] : doc.blocks).map(b => b.i));
+      for (const b of doc.blocks) { const e = el(b); if (e) e.classList.toggle('dim', !focus.has(b.i)); } }
+    root.dispatchEvent(new Event('genesis:view'));
   };
   addEventListener('scroll', inView, { passive: true }); addEventListener('resize', inView); inView();
   // a tap on the bar's loop: to the next loop's header; on its layer: to the
