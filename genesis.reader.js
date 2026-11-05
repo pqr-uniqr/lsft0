@@ -5,8 +5,9 @@
 // the sentences black and red. the model and the views are stringified
 // into the page, where the reader rebuilds the model from the text and
 // keeps it, with the views and a re-render, under window.genesis, the
-// ground the page's other modules stand on: the flash readers
-// (genesis.flash.js), shipped after it. the loop
+// ground the page's other modules stand on: the bar (genesis.bar.js) and
+// the flash readers (genesis.flash.js), shipped after it and shared with
+// the L4 editor (genesis.js), which reads the model live. the loop
 // headers stand in the body's style; the harness's bar, VvilL at its left,
 // sticks to the top and, once the first loop's header has scrolled under
 // it, says at its center the loop the page's center holds, large, bold
@@ -28,6 +29,7 @@ const V = require('./atmosphere').register('VvilL.js');
 const M = require('./atmosphere').register('genesis.model.js');
 const W = require('./atmosphere').register('genesis.views.js');
 const F = require('./atmosphere').register('genesis.flash.js');
+const B = require('./atmosphere').register('genesis.bar.js');
 
 // 📄 GENESIS.txt, read. a 🎨 subgene passes style overrides to the frame.
 function read(xface, subgenes, petri) {
@@ -44,83 +46,26 @@ function read(xface, subgenes, petri) {
     + `<p id="cstatus" class="vvill-status"></p>`
     + `<script type="application/json" id="text">${JSON.stringify(raw).replace(/</g, '\\u003c')}</script>`
     + `<script>const model = (${M.MODEL}), views = (${W.VIEWS})();\n${READER_JS}</script>`
+    + `<script>${B.BAR_JS}</script>`
     + `<script>${F.FLASH_JS}</script>`,
-    { title: cpath.split('/').pop(), styles, head: `<style>${READER_CSS}${F.FLASH_CSS}</style>` });
+    { title: cpath.split('/').pop(), styles, head: `<style>${READER_CSS}${B.BAR_CSS}${F.FLASH_CSS}</style>` });
 }
 
-// the bar sticks, in the page's own background (inherit: the body's, in
-// either mode), a grid of two rows: VvilL left on the loop's line, the
-// loop centered and larger, the layer centered under it, its line always
-// kept so the bar never jumps, the document's name under the logo. the
-// layer takes the body's number colors,
-// n mod 7 (the kernel's, light and dark). the gutter numbers in full color
-const INK = ['#d00000', '#e07000', '#b8a000', '#00a000', '#0070d0', '#0000d0', '#7000d0'];
-const INK_DARK = ['#ff0000', '#ff8000', '#ffff00', '#00ff00', '#0080ff', '#0000ff', '#8000ff'];
-const inks = (pre, cols) => cols.map((c, n) => `${pre} .vvill-bar .d${n} { color: ${c}; }`).join('\n  ');
+// the gutter numbers in full color, so they read on a phone. the bar's
+// own styles come with it (genesis.bar.js), the flash readers' with them
 const READER_CSS = /* css */ `
-  .vvill-bar { position: sticky; top: 0; z-index: 2; background: inherit; display: grid; grid-template-columns: 1fr auto 1fr; column-gap: 12px; align-items: center; padding: 8px 16px; }
-  .vvill-bar a { grid-area: 1 / 1; }
-  .vvill-doc { grid-area: 2 / 1; font-weight: bold; white-space: nowrap; line-height: 1.2; min-height: 1.2em; }
-  .vvill-loop { grid-area: 1 / 2; text-align: center; font-size: 1.3em; font-weight: bold; font-style: italic; white-space: nowrap; line-height: 1.15; min-height: 1.15em; }
-  .vvill-layer { grid-area: 2 / 2; text-align: center; font-weight: bold; white-space: nowrap; line-height: 1.2; min-height: 1.2em; }
-  .vvill-loop, .vvill-layer { cursor: pointer; }
-  ${inks('', INK)}
-  @media (prefers-color-scheme: dark) { ${inks(':root:not([data-theme="light"])', INK_DARK)} }
-  ${inks(':root[data-theme="dark"]', INK_DARK)}
-  .vvill-conscious .g { opacity: 1; font-weight: bold; } /* the gutter numbers in full color, so they read on a phone */
-  .vvill-conscious .blk { transition: opacity 0.3s; }
-  .vvill-conscious .blk.dim { opacity: 0.5; } /* out of focus */
-  .vvill-conscious.writing .blk.dim { opacity: 1; } /* not while the flash reader writes */
+  .vvill-conscious .g { opacity: 1; font-weight: bold; }
 `;
 
 // the page's script: the model rebuilt from the text, the reader's API,
-// the loop in view named in the bar, dark mode on a tap of the title art
+// dark mode on a tap of the title art; the bar and the flash readers
+// follow, standing on window.genesis
 const READER_JS = /* js */ `(() => {
   const root = document.getElementById('conscious'), status = document.getElementById('cstatus');
   const doc = model(JSON.parse(document.getElementById('text').textContent));
   const say = (m) => { status.textContent = m; };
-  const render = (name) => { const v = views[name]; if (!v) return false; root.innerHTML = v.html(doc); root.dataset.view = name; els.clear(); dimmed = null; inView(); root.dispatchEvent(new Event('genesis:render')); return true; };
-  // the loop and the layer in view: once the first loop header has scrolled
-  // under the bar, the last loop header above the page's center, and the
-  // last layer body after it; named in the bar, and told to the page
-  const bar = document.querySelector('.vvill-bar'), head = document.createElement('i'), sub = document.createElement('span'), name = document.createElement('span');
-  head.className = 'vvill-loop'; sub.className = 'vvill-layer'; name.className = 'vvill-doc'; bar.append(head, sub, name);
-  const els = new Map();
-  const el = (b) => { let e = els.get(b.i); if (!e) { e = root.querySelector('.blk[data-i="' + b.i + '"]'); els.set(b.i, e); } return e; };
-  let loop = null, layer = null, dimmed = null;
-  const inView = () => {
-    const under = bar.getBoundingClientRect().bottom, mid = innerHeight / 2; let l = null, y = null;
-    const first = doc.loops.length ? el(doc.loops[0].head) : null;
-    if (first && first.getBoundingClientRect().top < under) for (const b of doc.blocks) {
-      if (b.role !== 'loop' && b.role !== 'body') continue;
-      const e = el(b); if (!e || e.getBoundingClientRect().top >= mid) break;
-      if (b.role === 'loop') { l = b.loop; y = null; } else y = b.layer;
-    }
-    loop = l === null ? null : doc.loop(l); layer = loop && y !== null ? doc.layer(l, y) : null;
-    head.textContent = loop ? loop.n + ': ' + loop.name : doc.header.title; name.textContent = loop ? doc.header.title : '';
-    sub.textContent = layer ? 'Layer ' + layer.n : ''; sub.className = 'vvill-layer' + (layer ? ' d' + (layer.n % 7) : '');
-    // the focus: the layer named, with its notes, or the loop named; the rest greyed
-    const key = layer ? 'y' + loop.n + '.' + layer.n : loop ? 'l' + loop.n : 'doc';
-    if (key !== dimmed) { dimmed = key;
-      const focus = new Set((layer ? layer.blocks : loop ? [loop.head, ...loop.lead, ...loop.layers.flatMap(z => z.blocks)] : doc.blocks).map(b => b.i));
-      for (const b of doc.blocks) { const e = el(b); if (e) e.classList.toggle('dim', !focus.has(b.i)); } }
-    root.dispatchEvent(new Event('genesis:view'));
-  };
-  addEventListener('scroll', inView, { passive: true }); addEventListener('resize', inView); inView();
-  // a tap on the bar's loop: to the next loop's header; on its layer: to the
-  // next layer's body. the block's first line is set just under the bar so
-  // the bar names it; the page's end stands for the blocks that cannot come
-  // under the bar on a tall window; past the last, the first again
-  const topOf = (b) => el(b).getBoundingClientRect().top + scrollY;
-  const go = (bs) => {
-    const h = bar.getBoundingClientRect().height, max = document.documentElement.scrollHeight - innerHeight;
-    const aim = (b) => Math.min(topOf(b) - h + 1, max);
-    const b = bs.find(b => aim(b) > scrollY + 1) || bs[0];
-    window.scrollTo({ top: aim(b), behavior: 'smooth' });
-  };
-  const nextLoop = () => go(doc.loops.map(l => l.head)), nextLayer = () => go(doc.loops.flatMap(l => l.layers).map(y => y.body));
-  head.addEventListener('click', nextLoop); sub.addEventListener('click', nextLayer);
-  window.genesis = { doc, views, render, say, nextLoop, nextLayer, get view() { return root.dataset.view; }, get loop() { return loop; }, get layer() { return layer; } };
+  const render = (name) => { const v = views[name]; if (!v) return false; root.innerHTML = v.html(doc); root.dataset.view = name; root.dispatchEvent(new Event('genesis:render')); return true; };
+  window.genesis = { doc, views, render, say, get view() { return root.dataset.view; } };
   root.addEventListener('click', (e) => { const blk = e.target.closest('.blk'); if (blk && blk.dataset.i === '0' && !e.target.closest('a')) theme(); });
   // dark mode on or off, pinned in localStorage and read before paint by
   // the frame's head script. a choice that matches the phone's own is

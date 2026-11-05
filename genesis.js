@@ -1,5 +1,6 @@
-// @ts-nocheck genesis.js - the L3 expression of GENESIS.txt, the one file it
-// edits: the primary's page, driven by a keyboard with vim's bindings.
+// @ts-nocheck genesis.js - the editors of GENESIS.txt, the one file they
+// edit: the primary's page, driven by a keyboard with vim's bindings, in
+// two dresses at two layers of the substrate.
 //
 // every file has layers of representations down the substrate: the plain
 // path is the interface, the primary representation; /_/path is L1, the
@@ -7,15 +8,36 @@
 // mycelium; /_/_/path is L2, the agent-facing protocol that exposes the
 // file system over HTTP; from /_/_/_/path (L3) down the layers are open: a
 // scratch space for expressions that may become primary, and a closet of
-// improvised alternative representations. this is one such, the first:
-// http://vostok.local:8880/_/_/_/vvill/GENESIS.txt
+// improvised alternative representations. two are here:
+//
+//   L3  http://vostok.local:8880/_/_/_/vvill/GENESIS.txt    conscious()
+//       the editor in Pete's editor's dress, not the harness's: the Ctrl
+//       Custom theme's purple page and orange ink (the other sentence
+//       blue, > lines ctrl's green), his red cursor and selection and
+//       yellow matches, and the Ac437 Nix8810 M16 font at his size,
+//       leading and tracking, served from /_fonts. one scheme in either
+//       device mode.
+//   L4  http://vostok.local:8880/_/_/_/_/vvill/GENESIS.txt  surface()
+//       the surface expression (genesis.reader.js, the primary) as a vim
+//       editor, the two merged: its white page and black and red
+//       sentences, the gutter numbers bold and full, the loop headers in
+//       the body's style, the frame's monospace at its size, light or
+//       dark as the device or the pin says, and its organs: the bar that
+//       names the loop and the layer in view (genesis.bar.js) and the
+//       flash readers (genesis.flash.js), reading the model
+//       (genesis.model.js) live from the buffer; with the L3's pane, 56
+//       columns and centered, and its ruler, red. the bar tracks the
+//       caret when it is in view, else the page's center as the reader
+//       does; its taps move the cursor; the player, open, has the keys;
+//       a re-render stops a flash.
 //
 // mycelium already threads the underscores: a request at L3 reads its
 // genes from /_/_/_/_/.node and /_/_/_/_/vvill/.node (the substrate of the
-// substrate), and its interface file is still /vvill/GENESIS.txt. so this
-// expression is two gene lines there, scoped to GENESIS.txt alone (L3 is
+// substrate), one at L4 from /_/_/_/_/_/.node and /_/_/_/_/_/vvill/.node,
+// and the interface file is still /vvill/GENESIS.txt. so each expression
+// is two gene lines there, scoped to GENESIS.txt alone (these layers are
 // for precisely scoped genes, and one shaped to this file would err on
-// another), and this module.
+// another), and this module: one engine, one page, two dresses.
 //
 // the page is the primary's (VvilL.js's frame and KERNEL render the same
 // blocks, sentences numbered in the gutter), with a buffer and a cursor of
@@ -23,11 +45,7 @@
 // hidden textbox holding the keyboard, a status line. the kernel is
 // stringified into the page, so a block re-renders as it is typed, by the
 // one renderer. links are left as written, so the columns match the
-// file's. the dress is Pete's editor's, not the harness's: the Ctrl Custom
-// theme's purple page and orange ink (the other sentence blue, > lines
-// ctrl's green), his red cursor and selection and yellow matches, and the
-// Ac437 Nix8810 M16 font at his size, leading and tracking, served from
-// /_fonts. one scheme in either device mode.
+// file's.
 //
 // what vim does here: motions (h j k l w b e W B E ge 0 ^ $ | gg G { }
 // ( ) f F t T ; , % n N * #, counts), operators d c y and gq (the reflow,
@@ -47,13 +65,17 @@
 // clipboard; a paste (⌘V) in normal mode puts. a click places the
 // cursor; a drag still selects.
 //
-// :w posts the whole file to /_/_/_/vvill/.save (the 📮 gene), which
+// :w posts the whole file to the layer's own /vvill/.save (the 📮 gene:
+// /_/_/_/vvill/.save at L3, one underscore more at L4), which
 // writes it only if the file still holds what the page loaded (else 409,
-// and :e! re-reads). the primary's block editor and vim on the same file
-// are safe against each other this way. LAN only, like the primary's.
+// and :e! re-reads). the editors on the same file are safe against each
+// other this way. LAN only, like the primary's.
 
 const log = require('./log.js').init(__filename, '⌨️', '32', 1);
 const V = require('./atmosphere').register('VvilL.js');
+const M = require('./atmosphere').register('genesis.model.js');
+const B = require('./atmosphere').register('genesis.bar.js');
+const F = require('./atmosphere').register('genesis.flash.js');
 const TW = 55; // the Lore's hard wrap
 const FILE = '/vvill/GENESIS.txt'; // the one file this editor is for
 
@@ -70,8 +92,11 @@ const crumb = (cpath, ipath) => {
   return `<p class="vvill-crumb">/${parts.join('/')}</p>`;
 };
 
-// 📄 GENESIS.txt as vim. off the LAN, the primary's blocks, read only.
-function conscious(xface, subgenes, petri) {
+// 📄 GENESIS.txt as vim, in a dress: the frame's styles, a stylesheet,
+// whether the loop headers stand as the primary's view has them, and
+// whether the reader's organs come along (the bar and the flash readers,
+// on the model, read live). off the LAN, the blocks, read only.
+const page = (xface, subgenes, petri, dress) => {
   const { cpath, ipath } = petri.pathology;
   const raw = xface.file.toString('utf8');
   let styles = {};
@@ -81,13 +106,21 @@ function conscious(xface, subgenes, petri) {
   const f = K.blocksOf(raw);
   const local = petri.pathology.spore.isLocal();
   const esc = K.esc;
-  const body = `<div id="vwrap"><div class="vvill-conscious vim" id="conscious" data-path="${esc(ipath)}" data-save="${esc(cpath.replace(/\/[^/]*$/, '') + '/.save')}" data-tw="${TW}">${K.blocksHtml(f)}</div>`
+  const html = dress.loops ? loops(K.blocksHtml(f)) : K.blocksHtml(f);
+  const body = `<div id="vwrap"><div class="vvill-conscious vim" id="conscious" data-path="${esc(ipath)}" data-save="${esc(cpath.replace(/\/[^/]*$/, '') + '/.save')}" data-tw="${TW}">${html}</div>`
     + `<div id="vline"></div><div id="ruler"></div><div id="vhl"></div><div id="caret" class="normal"></div><div id="vsel"></div><textarea id="vin" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"></textarea></div>`
     + `<div class="vim-stat"><span id="vmode"></span><span id="vpos"></span></div>`;
   const script = local ? `<script type="application/json" id="text">${JSON.stringify(raw).replace(/</g, '\\u003c')}</script>`
-    + `<script>const K = (${V.KERNEL})({ links: false });\n${VIM_JS}</script>` : '';
-  return V.frame(crumb(cpath, ipath) + body + script, { title: 'vim ' + ipath.split('/').pop(), styles: { ...DRESS, ...styles }, noZoom: local, head: `<style>${VIM_CSS}</style>` });
-}
+    + `<script>const K = (${V.KERNEL})({ links: false });\n${dress.loops ? LOOPS_JS : ''}${VIM_JS}</script>`
+    + (dress.bar ? `<script>const model = (${M.MODEL});\n${GLUE_JS}</script><script>${B.BAR_JS}</script><script>${F.FLASH_JS}</script>` : '') : '';
+  return V.frame(crumb(cpath, ipath) + body + script, { title: 'vim ' + ipath.split('/').pop(), styles: { ...dress.styles, ...styles }, noZoom: local, head: `<style>${dress.css}${dress.bar ? B.BAR_CSS + F.FLASH_CSS : ''}</style>` });
+};
+
+// 📄 L3: GENESIS.txt as vim, in Pete's editor's dress
+function conscious(xface, subgenes, petri) { return page(xface, subgenes, petri, { styles: DRESS, css: VIM_CSS }); }
+
+// 📄 L4: the surface expression as vim, the reader's organs along
+function surface(xface, subgenes, petri) { return page(xface, subgenes, petri, { styles: {}, css: SURFACE_CSS, loops: true, bar: true }); }
 
 // 📮 save: the whole file, written only if it still holds what the page
 // loaded (else 409 with the text on disk, and the page says :e!).
@@ -106,7 +139,7 @@ async function save(body, petri) {
   return json(200, { ok: true });
 }
 
-// the editor's dress, Pete's editor's: the Ctrl Custom theme's page and
+// the L3's dress, Pete's editor's: the Ctrl Custom theme's page and
 // ink (the other sentence blue; ctrl's syntax in its own colors, the >
 // lines its green), the cursor, selection and match colors of his
 // settings, and the Ac437 Nix8810 M16 font, served from /_fonts, at his
@@ -152,6 +185,69 @@ const VIM_CSS = /* css */ `
   .vim-stat #vpos { color: #747478; flex: none; }
 `;
 
+// the loop headers as the primary's view (genesis.views.js) has them: in
+// the body's style, classed loop and carrying their number, the one way
+// that view differs from the kernel's page. the same function on both
+// sides: here over the page's first rendering, there over the kernel's
+// block renderer, which the editor re-renders a block by.
+function loops(html) { return html.replace(/<span class="l hdr hdr1"># Loop (\d+):/g, '<span class="l loop" data-loop="$1"># Loop $1:'); }
+const LOOPS_JS = `${loops.toString()}\n{ const bh = K.blockHtml; K.blockHtml = (b, i) => loops(bh(b, i)); }\n`;
+
+// the L4's ground for the reader's organs: window.genesis with the model
+// read live from the editor's buffer (rebuilt when it changed), the probe
+// the bar tracks by (the caret, when it is in view, else the page's
+// center as the reader has it), and the bar's taps carried out as the
+// editor's own motions: the next loop or layer after the cursor's line,
+// the cursor set on its first line, the line set under the bar
+const GLUE_JS = /* js */ `(() => {
+  const vim = window.vim, bar = document.querySelector('.vvill-bar'), caret = document.getElementById('caret');
+  let was = null, doc = null;
+  window.genesis = {
+    get doc() { const t = vim.text; if (t !== was) { was = t; doc = model(t); } return doc; },
+    probe: () => { const c = caret.getBoundingClientRect(), under = bar.getBoundingClientRect().bottom;
+      return c.top >= under && c.bottom <= innerHeight - 36 ? (c.top + c.bottom) / 2 : innerHeight / 2; },
+    go: (bs) => { const l = vim.line, b = bs.find(b => b.line > l) || bs[0];
+      if (vim.mode !== 'normal') vim.send('<Esc>'); vim.send(':' + (b.line + 1) + '<CR>zt'); },
+  };
+})();`;
+
+// the L4's dress, the surface's: the frame's white page and black ink,
+// the sentences black and red, the gutter numbers bold and full, the
+// frame's monospace at its size on main too, so the pane's width is in
+// its columns (the crumb kept in the body's serif), dark as the device
+// or the pin says, the overlays following; the L3's pane, 56 columns
+// and centered, and its ruler, red. the current line a grey band; the
+// selection a pale red both the black and the red sentences read
+// through; the matches underlined red; the caret a red block with its
+// glyph inverted (cyan, in difference: cyan over the white page), an
+// insert bar red.
+const MONO = 'ui-monospace, Menlo, Consolas, monospace';
+const SIZE = 'min(1rem, calc((100vw - 32px) / 34))';
+const SURFACE_DARK = [
+  ['#vline', 'background: #1a1a1a;'], ['#vsel div', 'background: #700000;'], ['#caret', 'background: #ff0000;'],
+  ['.vim-stat', 'background: #000; color: #fff; border-color: #fff;'], ['.vim-stat #vpos', 'color: #aaa;']];
+const surfaceDark = (pre) => SURFACE_DARK.map(([s, d]) => `${pre} ${s} { ${d} }`).join('\n  ');
+const SURFACE_CSS = /* css */ `
+  main { font-family: ${MONO}; font-size: ${SIZE}; max-width: 56ch; }
+  .vvill-crumb { font-family: serif; font-size: 1rem; }
+  #conscious .blk { margin: 0; }
+  #conscious .g { opacity: 1; font-weight: bold; }
+  #vwrap { position: relative; isolation: isolate; }
+  #vline, #ruler, #vsel div, #vhl div { position: absolute; pointer-events: none; z-index: -1; }
+  #vline { left: -16px; right: -16px; background: #f0f0f0; }
+  #ruler { top: 0; bottom: 0; width: 0; border-left: 1px solid #ff0000; }
+  #vsel div { background: #ffc4c4; }
+  #vhl div { border-bottom: 2px solid #ff0000; box-sizing: border-box; }
+  #caret { position: absolute; pointer-events: none; background: #00ffff; mix-blend-mode: difference; }
+  #caret.insert { background: #ff0000; mix-blend-mode: normal; }
+  #vin { position: absolute; width: 1px; opacity: 0; border: 0; padding: 0; margin: 0; resize: none; outline: 0; font: inherit; overflow: hidden; }
+  .vim-stat { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; gap: 1em; padding: 4px 16px;
+    border-top: 1px solid #000; background: #fff; color: #000; font-family: ${MONO}; font-size: 0.85em; line-height: 20px; white-space: pre; overflow: hidden; }
+  .vim-stat #vpos { color: #666; flex: none; }
+  @media (prefers-color-scheme: dark) { ${surfaceDark(':root:not([data-theme="light"])')} }
+  ${surfaceDark(':root[data-theme="dark"]')}
+`;
+
 // ⌨️ the editor. one string, the buffer; one offset, the cursor; a key
 // buffer parsed on every key by vim's grammar: [count] [operator [count]]
 // (motion | object | command). raw, so its regexes read as written.
@@ -162,7 +258,7 @@ const VIM_JS = String.raw`(() => {
   // string; the cursor an offset into it; lines are found by their starts.
   const wrap = document.getElementById('vwrap'), root = document.getElementById('conscious'),
     path = root.dataset.path, caret = document.getElementById('caret'), selbox = document.getElementById('vsel'), ruler = document.getElementById('ruler'), vline = document.getElementById('vline'), hlbox = document.getElementById('vhl'),
-    ta = document.getElementById('vin'), left = document.getElementById('vmode'), right = document.getElementById('vpos');
+    ta = document.getElementById('vin'), left = document.getElementById('vmode'), right = document.getElementById('vpos'), bar = document.querySelector('.vvill-bar');
   const raw = JSON.parse(document.getElementById('text').textContent);
   const eol = raw.endsWith('\n');
   let text = eol ? raw.slice(0, -1) : raw, savedRaw = raw;
@@ -197,13 +293,15 @@ const VIM_JS = String.raw`(() => {
   // the page: lead and separators as blank lines, each block by the kernel
   const nl = (s) => { let n = 0; for (let i = 0; i < s.length; i++) if (s[i] === '\n') n++; return n; };
   const same = (f, g) => f && g && f.lead === g.lead && f.blocks.length === g.blocks.length && f.blocks.every((b, i) => b.sep === g.blocks[i].sep);
+  // the page's other modules (the L4's bar and flash readers) are told of a re-render
+  const told = () => root.dispatchEvent(new Event('genesis:render'));
   function render() {
     const f = K.blocksOf(text);
     if (same(prev, f)) {
       const diff = f.blocks.map((b, i) => b.text !== prev.blocks[i].text ? i : -1).filter(i => i >= 0);
       if (diff.length === 0) { prev = f; return; }
       if (diff.length === 1) { const i = diff[0]; const el = root.querySelector('.blk[data-i="' + i + '"]');
-        if (el) { el.outerHTML = K.blockHtml(f.blocks[i], i); prev = f; reindex(f); return; } }
+        if (el) { el.outerHTML = K.blockHtml(f.blocks[i], i); prev = f; reindex(f); told(); return; } }
     }
     const parts = []; let l = 0;
     const blank = () => { parts.push('<span class="l blank">' + K.esc(line(l)) + '</span>'); l++; };
@@ -211,7 +309,7 @@ const VIM_JS = String.raw`(() => {
     f.blocks.forEach((b, i) => { parts.push(K.blockHtml(b, i)); l += nl(b.text) + 1; for (let k = b.sep ? nl(b.sep) - 1 : 0; k > 0; k--) blank(); });
     while (l < starts.length) blank();
     root.innerHTML = parts.join('');
-    prev = f; reindex(f);
+    prev = f; reindex(f); told();
   }
   function reindex() { lineEl = Array.from(root.querySelectorAll('.l')); }
 
@@ -244,6 +342,7 @@ const VIM_JS = String.raw`(() => {
   // takes the view back
   let aim = null, frame = 0, tick = 0;
   const pad = () => 3 * lh, viewH = () => innerHeight - 36, viewTop = () => aim === null ? scrollY : aim;
+  const inset = () => Math.max(0, bar ? bar.getBoundingClientRect().bottom : 0); // the bar's depth while it is in view (the L4's sticks)
   const lineY = (l) => { const b = lineEl[l].getBoundingClientRect(); return { top: b.top + scrollY, bot: b.bottom + scrollY }; };
   const glide = (y) => { y = Math.max(0, Math.min(document.documentElement.scrollHeight - innerHeight, Math.round(y)));
     if (y === viewTop()) return; aim = y;
@@ -267,8 +366,9 @@ const VIM_JS = String.raw`(() => {
     vline.style.top = y + 'px'; vline.style.height = lh + 'px';
     ta.style.left = x + 'px'; ta.style.top = y + 'px'; ta.style.height = lh + 'px';
     const top = r.top + scrollY, bot = top + h, vt = viewTop();
-    if (top < vt + pad()) glide(top < 2 * pad() ? 0 : top - pad()); else if (bot > vt + viewH() - pad()) glide(bot - viewH() + pad());
+    if (top < vt + inset() + pad()) glide(top < inset() + 2 * pad() ? 0 : top - inset() - pad()); else if (bot > vt + viewH() - pad()) glide(bot - viewH() + pad());
     selection(); hilite(); status();
+    if (window.genesis && window.genesis.inView) window.genesis.inView(); // the bar follows the caret
   }
   const selRange = () => {
     if (mode === 'visual') { const a = Math.min(anchor, cur), b = Math.max(anchor, cur); return { a, b: Math.min(N(), b + 1), lw: false }; }
@@ -593,12 +693,12 @@ const VIM_JS = String.raw`(() => {
       case '/': enterCmd('/'); return true;
       case '?': enterCmd('?'); return true;
       case 'z': { if (t[i + 1] === undefined) return 'wait'; const r = rectOf(cur); if (!r) return true; const y = r.top + scrollY, h = r.height || lh;
-        if (t[i + 1] === 'z') glide(y + h / 2 - viewH() / 2); else if (t[i + 1] === 't') glide(y < 2 * pad() ? 0 : y - pad()); else if (t[i + 1] === 'b') glide(y + h - viewH() + pad()); place(); return true; }
+        if (t[i + 1] === 'z') glide(y + h / 2 - (inset() + viewH()) / 2); else if (t[i + 1] === 't') glide(y < inset() + 2 * pad() ? 0 : y - inset() - pad()); else if (t[i + 1] === 'b') glide(y + h - viewH() + pad()); place(); return true; }
       case '<C-d>': case '<C-u>': case '<C-f>': case '<C-b>': case '<PageDown>': case '<PageUp>': { const page = Math.max(1, Math.floor((innerHeight - 40) / lh));
         const d = Math.max(1, (k === '<C-d>' || k === '<C-u>') ? Math.floor(page / 2) : (k === '<PageDown>' || k === '<PageUp>') ? 5 * n : page - 2);
         const dir = (k === '<C-d>' || k === '<C-f>' || k === '<PageDown>') ? 1 : -1; glide(viewTop() + dir * d * lh); const l = Math.max(0, Math.min(lastLine(), lineOf(cur) + dir * d)); cur = at(l, want); cur = clampNormal(cur); place(); return true; }
       case '<C-e>': case '<C-y>': { glide(viewTop() + (k === '<C-e>' ? n : -n) * lh); let l = lineOf(cur);
-        while (l < lastLine() && lineY(l).top < viewTop() + pad()) l++; while (l > 0 && lineY(l).bot > viewTop() + viewH() - pad()) l--;
+        while (l < lastLine() && lineY(l).top < viewTop() + inset() + pad()) l++; while (l > 0 && lineY(l).bot > viewTop() + viewH() - pad()) l--;
         if (l !== lineOf(cur)) cur = clampNormal(at(l, want)); place(); return true; }
       // ,w writes (Pete's shortcut). a lone , waits a second for the w, then
       // is the motion (the reverse of ;); any other key after it is the
@@ -719,8 +819,10 @@ const VIM_JS = String.raw`(() => {
   const nameOf = (e) => { const k = e.key; if (NAMES[k]) return NAMES[k]; if (k.length !== 1) return null;
     if (e.ctrlKey) return '<C-' + k.toLowerCase() + '>'; if (e.metaKey) return '<D-' + k.toLowerCase() + '>'; return k; };
   const CTRL = new Set(['<C-r>', '<C-d>', '<C-u>', '<C-f>', '<C-b>', '<C-e>', '<C-y>', '<C-[>', '<C-c>']);
+  // the page's player (the L4's flash readers'), when open, has the keys
+  const busy = () => !!(window.genesis && window.genesis.flash && window.genesis.flash.play);
   ta.addEventListener('keydown', (e) => {
-    if (e.isComposing || e.keyCode === 229) return;
+    if (e.isComposing || e.keyCode === 229 || busy()) return;
     const k = nameOf(e); if (!k) return;
     if (k === '<D-s>') { e.preventDefault(); ex('w'); return; }
     if (k.startsWith('<D-')) return;
@@ -741,7 +843,7 @@ const VIM_JS = String.raw`(() => {
     if (!document.hasFocus() || document.activeElement !== document.body || Date.now() - pressed < 500) return;
     if (mode === 'insert') leave(); else if (mode === 'cmd') cmdKey('<Esc>'); else feed('<Esc>'); ta.focus({ preventScroll: true }); }, 0));
   // what the textbox catches on its own: composed text, dead keys, a paste
-  const drain = () => { const v = ta.value; if (!v) return; ta.value = '';
+  const drain = () => { const v = ta.value; if (!v) return; ta.value = ''; if (busy()) return;
     if (mode === 'insert') typed(v); else if (mode === 'normal') { reg = { text: v.endsWith('\n') ? v.slice(0, -1) : v, line: v.endsWith('\n') }; put(false, 1); } };
   ta.addEventListener('input', (e) => { if (e.isComposing) return; drain(); });
   ta.addEventListener('compositionend', () => setTimeout(drain, 0));
@@ -766,10 +868,10 @@ const VIM_JS = String.raw`(() => {
   if (document.fonts) { const fit = () => { measure(); place(); }; document.fonts.ready.then(fit); document.fonts.addEventListener('loadingdone', fit); }
   // a handle for scripts: send('dwihello<Esc>') types as vim reads it
   const KEYS = { '<Esc>': 'Escape', '<CR>': 'Enter', '<BS>': 'Backspace', '<Tab>': 'Tab', '<Del>': 'Delete', '<Left>': 'ArrowLeft', '<Right>': 'ArrowRight', '<Up>': 'ArrowUp', '<Down>': 'ArrowDown', '<PageDown>': 'PageDown', '<PageUp>': 'PageUp' };
-  window.vim = { get text() { return text; }, get cur() { return cur; }, get mode() { return mode; }, get reg() { return reg; }, get msg() { return msg; },
+  window.vim = { get text() { return text; }, get cur() { return cur; }, get line() { return lineOf(cur); }, get mode() { return mode; }, get reg() { return reg; }, get msg() { return msg; },
     send: (s) => { const toks = s.match(/<[^>]+>|[^]/g) || []; for (const t of toks) { let m;
       if ((m = t.match(/^<C-(.)>$/))) ta.dispatchEvent(new KeyboardEvent('keydown', { key: m[1], ctrlKey: true, cancelable: true }));
       else ta.dispatchEvent(new KeyboardEvent('keydown', { key: KEYS[t] || t, cancelable: true })); } } };
 })();`;
 
-module.exports = { conscious, save };
+module.exports = { conscious, surface, save };

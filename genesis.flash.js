@@ -50,7 +50,7 @@ const FLASH_CSS = /* css */ `
 `;
 
 const FLASH_JS = /* js */ `(() => {
-  const g = window.genesis, doc = g.doc, root = document.getElementById('conscious'), bar = document.querySelector('.vvill-bar');
+  const g = window.genesis, root = document.getElementById('conscious'), bar = document.querySelector('.vvill-bar'); // the model live under g.doc (the editor's changes as it types)
   const SPEED = { text: 300, words: 300 };
   try { Object.assign(SPEED, JSON.parse(localStorage.getItem('genesis-speed') || '{}')); } catch (e) {}
   const keep = () => { try { localStorage.setItem('genesis-speed', JSON.stringify(SPEED)); } catch (e) {} };
@@ -69,6 +69,7 @@ const FLASH_JS = /* js */ `(() => {
     const y = g.layer, l = g.loop;
     if (y) return { kind: 'layer', name: 'Loop ' + y.loop + ' · Layer ' + y.n, blocks: [y.body], layers: [y] };
     if (l) return { kind: 'loop', name: 'Loop ' + l.n + ': ' + l.name, blocks: [l.head, ...l.layers.map(z => z.body)], layers: l.layers };
+    const doc = g.doc;
     return { kind: 'doc', name: doc.header.title, blocks: doc.loops.flatMap(z => [z.head, ...z.layers.map(q => q.body)]), layers: doc.loops.flatMap(z => z.layers) };
   };
 
