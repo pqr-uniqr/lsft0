@@ -57,8 +57,10 @@
 // : and o; i a I A o O, insert's ^W ^U, text breaking at the width as it
 // is typed (never a line already past it); z z/t/b, ^D ^U ^F ^B ^E ^Y,
 // PageDown and PageUp five lines (times a count), every scroll a glide; a ruler
-// after the last column of the width; / ? searching as the pattern is
-// typed, every match lit until :noh, n N (smartcase), :s/pat/rep/g over
+// after the last column of the width; - and = size the text, finer than
+// the browser's zoom (five percent a step, times a count, kept per page
+// in localStorage and set before the first paint; the browser's zoom is
+// still its own); / ? searching as the pattern is typed, every match lit until :noh, n N (smartcase), :s/pat/rep/g over
 // ranges (% N,M . $ '<,'>),
 // :N, :w (and ⌘S, and ,w), :q :q! :wq :x ZZ ZQ (q leaves for the interface
 // path),
@@ -114,10 +116,12 @@ const page = (xface, subgenes, petri, dress) => {
   const script = local ? `<script type="application/json" id="text">${JSON.stringify(raw).replace(/</g, '\\u003c')}</script>`
     + `<script>const K = (${V.KERNEL})({ links: false });\n${dress.loops ? LOOPS_JS : ''}${VIM_JS}</script>`
     + (dress.bar ? `<script>const model = (${M.MODEL});\n${GLUE_JS}</script><script>${B.BAR_JS}</script><script>${F.FLASH_JS}</script>` : '') : '';
-  return V.frame(crumb(cpath, ipath) + body + script, { title: 'vim ' + ipath.split('/').pop(), styles: { ...dress.styles, ...styles }, noZoom: local, head: `<style>${dress.css}${dress.bar ? B.BAR_CSS + F.FLASH_CSS : ''}</style>` });
+  return V.frame(crumb(cpath, ipath) + body + script, { title: 'vim ' + ipath.split('/').pop(), styles: { ...dress.styles, ...styles }, noZoom: local, head: `<style>${dress.css}${dress.bar ? B.BAR_CSS + F.FLASH_CSS : ''}</style>${local ? ZOOM_HEAD : ''}` });
 };
 
 // 📄 L3: GENESIS.txt as vim, in Pete's editor's dress
+// the kept text size, set before the first paint (the engine reads the same key)
+const ZOOM_HEAD = '<script>try { const z = localStorage.getItem("vim.zoom:" + location.pathname); if (z) document.documentElement.style.setProperty("--vz", z); } catch (e) {}</script>';
 function conscious(xface, subgenes, petri) { return page(xface, subgenes, petri, { styles: DRESS, css: VIM_CSS }); }
 
 // 📄 L4: the surface expression as vim, the reader's organs along
@@ -163,8 +167,8 @@ const VIM_CSS = /* css */ `
   :root .vvill-bar, :root[data-theme] .vvill-bar { border-color: #5a2a7a; }
   .vvill-bar a { font-weight: normal; }
   .vvill-bar { font-size: 13px; letter-spacing: 0.5px; }
-  main { font-size: 13px; letter-spacing: 0.5px; max-width: calc(56ch + 28px); }
-  #conscious { font-family: ${FONT}; font-size: 13px; line-height: 0.82; letter-spacing: 0.5px; }
+  main { font-size: calc(13px * var(--vz, 1)); letter-spacing: calc(0.5px * var(--vz, 1)); max-width: calc(56ch + 28px); }
+  #conscious { font-family: ${FONT}; font-size: inherit; line-height: 0.82; letter-spacing: inherit; }
   #conscious, #conscious * { font-weight: normal; }
   #conscious .blk { margin: 0; }
   #conscious .l { min-height: 0.82em; }
@@ -237,7 +241,8 @@ const SURFACE_DARK = [
   ['.vim-stat', 'background: #000; color: #fff; border-color: #fff;'], ['.vim-stat #vpos', 'color: #aaa;']];
 const surfaceDark = (pre) => SURFACE_DARK.map(([s, d]) => `${pre} ${s} { ${d} }`).join('\n  ');
 const SURFACE_CSS = /* css */ `
-  main { font-family: ${MONO}; font-size: ${SIZE}; max-width: 56ch; }
+  main { font-family: ${MONO}; font-size: calc(${SIZE} * var(--vz, 1)); max-width: 56ch; }
+  #conscious { font-size: inherit; }
   .vvill-crumb { font-family: serif; font-size: 1rem; }
   #conscious .blk { margin: 0; }
   #conscious .g { opacity: 1; font-weight: bold; }
@@ -344,6 +349,14 @@ const VIM_JS = String.raw`(() => {
     root.appendChild(s); cw = s.getBoundingClientRect().width / 10; s.remove(); lh = (lineEl[0] && lineEl[0].getBoundingClientRect().height) || parseFloat(getComputedStyle(root).fontSize) * 1.45 || 20; rule(); };
   // the ruler: a hairline after the last column of the width
   const rule = () => { const l0 = lineEl[0] || root; ruler.style.left = (l0.getBoundingClientRect().left - wrap.getBoundingClientRect().left + tw * cw) + 'px'; };
+  // - and = size the text, finer than the browser's zoom: five percent a
+  // step, times a count, between half and four times; kept per page in
+  // localStorage, which a line in the head reads before the first paint;
+  // the dresses scale by --vz
+  const ZKEY = 'vim.zoom:' + location.pathname; let zoom = 1;
+  try { zoom = Math.min(4, Math.max(0.5, +localStorage.getItem(ZKEY) || 1)); } catch (e) {}
+  const zoomBy = (d) => { zoom = Math.min(4, Math.max(0.5, Math.round((zoom + d) * 20) / 20)); document.documentElement.style.setProperty('--vz', zoom);
+    try { localStorage.setItem(ZKEY, zoom); } catch (e) {} say(Math.round(zoom * 100) + '%'); measure(); place(); };
 
   // ---- the view: every scroll is one eased glide toward an aim, so a key
   // pressed mid-glide reckons from where the view is heading, not where it is;
@@ -719,6 +732,7 @@ const VIM_JS = String.raw`(() => {
         if (t[i + 1] === 'w') { ex('w'); return true; }
         const m = motion(t, i, { n: c1, op: false }); if (m && m !== 'wait') move(m); return run(keys = t.slice(i + 1)); }
       case 'Z': { if (t[i + 1] === undefined) return 'wait'; if (t[i + 1] === 'Z') ex('x'); else if (t[i + 1] === 'Q') ex('q!'); return true; }
+      case '-': case '=': zoomBy((k === '=' ? 1 : -1) * 0.05 * n); return true;
       // Tab and Shift+Tab step the page's structure when the page offers one
       // (the L4's layers): the page names the line n steps on or back, the
       // editor sets the cursor on it, the line under the bar
@@ -887,7 +901,7 @@ const VIM_JS = String.raw`(() => {
   if (document.fonts) { const fit = () => { measure(); place(); }; document.fonts.ready.then(fit); document.fonts.addEventListener('loadingdone', fit); }
   // a handle for scripts: send('dwihello<Esc>') types as vim reads it
   const KEYS = { '<Esc>': 'Escape', '<CR>': 'Enter', '<BS>': 'Backspace', '<Tab>': 'Tab', '<Del>': 'Delete', '<Left>': 'ArrowLeft', '<Right>': 'ArrowRight', '<Up>': 'ArrowUp', '<Down>': 'ArrowDown', '<PageDown>': 'PageDown', '<PageUp>': 'PageUp' };
-  window.vim = { get text() { return text; }, get cur() { return cur; }, get line() { return lineOf(cur); }, get mode() { return mode; }, get reg() { return reg; }, get msg() { return msg; },
+  window.vim = { get text() { return text; }, get cur() { return cur; }, get line() { return lineOf(cur); }, get mode() { return mode; }, get reg() { return reg; }, get msg() { return msg; }, get zoom() { return zoom; },
     send: (s) => { const toks = s.match(/<[^>]+>|[^]/g) || []; for (const t of toks) { let m;
       if ((m = t.match(/^<C-(.)>$/))) ta.dispatchEvent(new KeyboardEvent('keydown', { key: m[1], ctrlKey: true, cancelable: true }));
       else if ((m = t.match(/^<S-(.+)>$/))) ta.dispatchEvent(new KeyboardEvent('keydown', { key: KEYS['<' + m[1] + '>'] || m[1], shiftKey: true, cancelable: true }));
