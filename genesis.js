@@ -28,8 +28,9 @@
 //       (genesis.model.js) live from the buffer; with the L3's pane, 56
 //       columns and centered, and its ruler, red. the bar tracks the
 //       caret when it is in view, else the page's center as the reader
-//       does; its taps move the cursor; the player, open, has the keys;
-//       a re-render stops a flash.
+//       does; its taps move the cursor, and Tab and Shift+Tab step the
+//       layers from the cursor's; the player, open, has the keys; a
+//       re-render stops a flash.
 //
 // mycelium already threads the underscores: a request at L3 reads its
 // genes from /_/_/_/_/.node and /_/_/_/_/vvill/.node (the substrate of the
@@ -198,16 +199,24 @@ const LOOPS_JS = `${loops.toString()}\n{ const bh = K.blockHtml; K.blockHtml = (
 // the bar tracks by (the caret, when it is in view, else the page's
 // center as the reader has it), and the bar's taps carried out as the
 // editor's own motions: the next loop or layer after the cursor's line,
-// the cursor set on its first line, the line set under the bar
+// the cursor set on its first line, the line set under the bar; and the
+// step the editor's Tab and Shift+Tab take, n layers on or back from the
+// cursor's in the order of the file, loops crossed and the ends joined
+// (from outside any layer, the first after or the last before the line)
 const GLUE_JS = /* js */ `(() => {
   const vim = window.vim, bar = document.querySelector('.vvill-bar'), caret = document.getElementById('caret');
   let was = null, doc = null;
-  window.genesis = {
+  const g = window.genesis = {
     get doc() { const t = vim.text; if (t !== was) { was = t; doc = model(t); } return doc; },
     probe: () => { const c = caret.getBoundingClientRect(), under = bar.getBoundingClientRect().bottom;
       return c.top >= under && c.bottom <= innerHeight - 36 ? (c.top + c.bottom) / 2 : innerHeight / 2; },
     go: (bs) => { const l = vim.line, b = bs.find(b => b.line > l) || bs[0];
       if (vim.mode !== 'normal') vim.send('<Esc>'); vim.send(':' + (b.line + 1) + '<CR>zt'); },
+    step: (n) => { const doc = g.doc, ys = doc.loops.flatMap(l => l.layers), L = ys.length; if (!L) return null;
+      const l = vim.line, p = doc.atLine(l);
+      let i = p && p.layer !== undefined ? ys.findIndex(y => y.loop === p.loop && y.n === p.layer) : -1;
+      if (i < 0) { const k = ys.filter(y => y.line < l).length; i = n > 0 ? k - 1 : k; }
+      return ys[(((i + n) % L) + L) % L].line; },
   };
 })();`;
 
@@ -343,6 +352,7 @@ const VIM_JS = String.raw`(() => {
   let aim = null, frame = 0, tick = 0;
   const pad = () => 3 * lh, viewH = () => innerHeight - 36, viewTop = () => aim === null ? scrollY : aim;
   const inset = () => Math.max(0, bar ? bar.getBoundingClientRect().bottom : 0); // the bar's depth while it is in view (the L4's sticks)
+  const ztop = () => { const r = rectOf(cur); if (r) { const y = r.top + scrollY; glide(y < inset() + 2 * pad() ? 0 : y - inset() - pad()); } }; // the line set under the bar, zt's
   const lineY = (l) => { const b = lineEl[l].getBoundingClientRect(); return { top: b.top + scrollY, bot: b.bottom + scrollY }; };
   const glide = (y) => { y = Math.max(0, Math.min(document.documentElement.scrollHeight - innerHeight, Math.round(y)));
     if (y === viewTop()) return; aim = y;
@@ -598,7 +608,7 @@ const VIM_JS = String.raw`(() => {
       case '<CR>': edit(cur, cur, '\n'); cur++; changed(); return true;
       case '<BS>': case '<C-h>': if (cur > 0) { edit(cur - 1, cur, ''); cur--; changed(); } return true;
       case '<Del>': if (cur < N()) { edit(cur, cur + 1, ''); changed(); } return true;
-      case '<Tab>': edit(cur, cur, '\t'); cur++; changed(); return true;
+      case '<Tab>': case '<S-Tab>': edit(cur, cur, '\t'); cur++; changed(); return true;
       case '<C-w>': { const p = backWord(cur, false); const a = lineOf(p) === l ? p : starts[l]; if (a < cur) { edit(a, cur, ''); cur = a; changed(); } return true; }
       case '<C-u>': if (cur > starts[l]) { edit(starts[l], cur, ''); cur = starts[l]; changed(); } return true;
       case '<Left>': cur = Math.max(0, cur - 1); place(); return true;
@@ -693,7 +703,7 @@ const VIM_JS = String.raw`(() => {
       case '/': enterCmd('/'); return true;
       case '?': enterCmd('?'); return true;
       case 'z': { if (t[i + 1] === undefined) return 'wait'; const r = rectOf(cur); if (!r) return true; const y = r.top + scrollY, h = r.height || lh;
-        if (t[i + 1] === 'z') glide(y + h / 2 - (inset() + viewH()) / 2); else if (t[i + 1] === 't') glide(y < inset() + 2 * pad() ? 0 : y - inset() - pad()); else if (t[i + 1] === 'b') glide(y + h - viewH() + pad()); place(); return true; }
+        if (t[i + 1] === 'z') glide(y + h / 2 - (inset() + viewH()) / 2); else if (t[i + 1] === 't') ztop(); else if (t[i + 1] === 'b') glide(y + h - viewH() + pad()); place(); return true; }
       case '<C-d>': case '<C-u>': case '<C-f>': case '<C-b>': case '<PageDown>': case '<PageUp>': { const page = Math.max(1, Math.floor((innerHeight - 40) / lh));
         const d = Math.max(1, (k === '<C-d>' || k === '<C-u>') ? Math.floor(page / 2) : (k === '<PageDown>' || k === '<PageUp>') ? 5 * n : page - 2);
         const dir = (k === '<C-d>' || k === '<C-f>' || k === '<PageDown>') ? 1 : -1; glide(viewTop() + dir * d * lh); const l = Math.max(0, Math.min(lastLine(), lineOf(cur) + dir * d)); cur = at(l, want); cur = clampNormal(cur); place(); return true; }
@@ -709,6 +719,11 @@ const VIM_JS = String.raw`(() => {
         if (t[i + 1] === 'w') { ex('w'); return true; }
         const m = motion(t, i, { n: c1, op: false }); if (m && m !== 'wait') move(m); return run(keys = t.slice(i + 1)); }
       case 'Z': { if (t[i + 1] === undefined) return 'wait'; if (t[i + 1] === 'Z') ex('x'); else if (t[i + 1] === 'Q') ex('q!'); return true; }
+      // Tab and Shift+Tab step the page's structure when the page offers one
+      // (the L4's layers): the page names the line n steps on or back, the
+      // editor sets the cursor on it, the line under the bar
+      case '<Tab>': case '<S-Tab>': { const g = window.genesis, ln = g && g.step ? g.step(k === '<Tab>' ? n : -n) : null; if (ln === null || ln === undefined) return null;
+        cur = clampNormal(firstNb(ln)); want = col(cur); ztop(); place(); return true; }
       case '<Esc>': case '<C-[>': case '<C-c>': return true;
     }
     const m = motion(t, i, { n: c1, op: false }); if (m === 'wait') return 'wait'; if (!m) return null;
@@ -737,18 +752,22 @@ const VIM_JS = String.raw`(() => {
   function enterCmd(prefix, sp) { mode = 'cmd'; cmd = prefix; cmdRange = sp || null; cmdFrom = cur; msg = ''; status(); }
   function cmdKey(k) {
     const live = cmd[0] === '/' || cmd[0] === '?';
-    const back = () => { mode = 'normal'; cmd = ''; if (live) { cur = cmdFrom; want = col(cur); hl = null; place(); } status(); };
+    const back = () => { mode = 'normal'; cmd = ''; if (live) { settleInc(); cur = cmdFrom; want = col(cur); hl = null; place(); } status(); };
     if (k === '<Esc>' || k === '<C-[>' || k === '<C-c>') { back(); return; }
     if (k === '<BS>') { if (cmd.length <= 1) { back(); return; } cmd = cmd.slice(0, -1); }
     else if (k === '<C-u>') cmd = cmd[0];
     else if (k === '<CR>') { const c = cmd; mode = 'normal'; cmd = '';
-      if (c[0] === ':') ex(c.slice(1)); else { cur = cmdFrom; find(c[0] === '?', c.slice(1)); hl = lastSearch ? { re: lastSearch.re, src: lastSearch.src } : null; hilite(); }
+      if (c[0] === ':') ex(c.slice(1)); else { settleInc(); cur = cmdFrom; find(c[0] === '?', c.slice(1)); hl = lastSearch ? { re: lastSearch.re, src: lastSearch.src } : null; hilite(); }
       status(); return; }
     else if (k.length === 1) cmd += k;
     else return;
-    if (live) incsearch(); status();
+    if (live) { clearTimeout(incTimer); incTimer = setTimeout(() => { incTimer = 0; incsearch(); status(); }, INC_DELAY); } status();
   }
-  // the search as it is typed: the view goes to the first match, every match lit
+  // the search as it is typed: the view goes to the first match, every match
+  // lit; it runs a beat after the last key, not on each, so a flurry of keys
+  // costs one search and one lighting, not one per key (the page froze)
+  const INC_DELAY = 150; let incTimer = 0;
+  const settleInc = () => { clearTimeout(incTimer); incTimer = 0; };
   function incsearch() {
     const src = cmd.slice(1), re = src && compile(src), m0 = msg;
     hl = re instanceof RegExp ? { re, src } : null;
@@ -816,7 +835,7 @@ const VIM_JS = String.raw`(() => {
 
   // ---- the keyboard
   const NAMES = { Escape: '<Esc>', Enter: '<CR>', Backspace: '<BS>', Tab: '<Tab>', Delete: '<Del>', ArrowLeft: '<Left>', ArrowRight: '<Right>', ArrowUp: '<Up>', ArrowDown: '<Down>', Home: '<Home>', End: '<End>', PageUp: '<PageUp>', PageDown: '<PageDown>' };
-  const nameOf = (e) => { const k = e.key; if (NAMES[k]) return NAMES[k]; if (k.length !== 1) return null;
+  const nameOf = (e) => { const k = e.key; if (NAMES[k]) return k === 'Tab' && e.shiftKey ? '<S-Tab>' : NAMES[k]; if (k.length !== 1) return null;
     if (e.ctrlKey) return '<C-' + k.toLowerCase() + '>'; if (e.metaKey) return '<D-' + k.toLowerCase() + '>'; return k; };
   const CTRL = new Set(['<C-r>', '<C-d>', '<C-u>', '<C-f>', '<C-b>', '<C-e>', '<C-y>', '<C-[>', '<C-c>']);
   // the page's player (the L4's flash readers'), when open, has the keys
@@ -871,6 +890,7 @@ const VIM_JS = String.raw`(() => {
   window.vim = { get text() { return text; }, get cur() { return cur; }, get line() { return lineOf(cur); }, get mode() { return mode; }, get reg() { return reg; }, get msg() { return msg; },
     send: (s) => { const toks = s.match(/<[^>]+>|[^]/g) || []; for (const t of toks) { let m;
       if ((m = t.match(/^<C-(.)>$/))) ta.dispatchEvent(new KeyboardEvent('keydown', { key: m[1], ctrlKey: true, cancelable: true }));
+      else if ((m = t.match(/^<S-(.+)>$/))) ta.dispatchEvent(new KeyboardEvent('keydown', { key: KEYS['<' + m[1] + '>'] || m[1], shiftKey: true, cancelable: true }));
       else ta.dispatchEvent(new KeyboardEvent('keydown', { key: KEYS[t] || t, cancelable: true })); } } };
 })();`;
 
