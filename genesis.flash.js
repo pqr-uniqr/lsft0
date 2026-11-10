@@ -18,8 +18,7 @@
 // the writing hides every character of the target's blocks (a loop's
 // header line only; the gutter and the numbers stay, as landmarks) and
 // shows them one by one, each frame as many as the clock says; stop, or
-// the end, restores the html as it was; while it writes, the reader's
-// greying of the blocks out of focus is lifted. the player takes the words of the
+// the end, restores the html as it was. the player takes the words of the
 // target's sentences (the model's cut), pausing a little longer on
 // punctuation and long words, and says which layer it is in; a tap on the
 // word pauses and resumes, Escape closes, space pauses. window.genesis
@@ -101,7 +100,7 @@ const FLASH_JS = /* js */ `(() => {
     stop(); const parts = t.blocks.map(el).filter(Boolean).map(e => ({ e, html: e.innerHTML })); if (!parts.length) return;
     for (const p of parts) { p.spans = chars(p.e); p.e.classList.add('flashing'); }
     run = { t, parts, spans: parts.flatMap(p => p.spans), n: 0, t0: performance.now(), scrolled: 0 };
-    root.classList.add('writing'); C.write.textContent = 'stop'; run.frame = requestAnimationFrame(tick);
+    C.write.textContent = 'stop'; run.frame = requestAnimationFrame(tick);
   };
   const tick = (now) => {
     const r = run; if (!r) return;
@@ -116,7 +115,7 @@ const FLASH_JS = /* js */ `(() => {
   const stop = () => {
     const r = run; if (!r) return; run = null; cancelAnimationFrame(r.frame);
     for (const p of r.parts) { p.e.innerHTML = p.html; p.e.classList.remove('flashing'); }
-    root.classList.remove('writing'); C.write.textContent = 'flash'; times();
+    C.write.textContent = 'flash'; times();
   };
 
   // ---- the player
