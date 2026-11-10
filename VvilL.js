@@ -97,7 +97,8 @@ const kernel = ({ links = true } = {}) => {
   // sentences, alternately black and red and numbered in a GUTTER, so a
   // paragraph's joints show on a phone. a terminal (. ? !), closed by any
   // quote or bracket and followed by white space or the end of the line, ends
-  // a sentence; an ellipsis and e.g./i.e. do not. the count is strict and
+  // a sentence; an ellipsis, e.g./i.e., and a ? inside parentheses (open
+  // since earlier in the block's run, as they may be) do not. the count is strict and
   // two-level: it runs through a block's RUN, the plain lines from its start
   // across their hard wraps, and the first sigil line (+, >, a header, a
   // rule...) interrupts it; the rest of that block is plain, and the next
@@ -106,23 +107,30 @@ const kernel = ({ links = true } = {}) => {
   const ABBR = /(?:^|[\s(])(?:e\.g|i\.e|etc|vs|cf)$/i;
   const LEAD = /^\s*(?:[>~+\-=|.,^$@\/\\!]|[a-z]:|x+ )?\s*/i;
   const words = (t) => t.match(LEAD)[0].length < t.length; // a word past any sigil
-  // where the sentences of a string end: the offsets just past each terminal
-  const ends = (s) => {
-    const r = []; let m;
+  // the depth of parentheses after a string, from a depth before it
+  const parens = (s, d = 0) => { for (const ch of s) if (ch === '(') d++; else if (ch === ')' && d > 0) d--; return d; };
+  // where the sentences of a string end: the offsets just past each terminal,
+  // the parentheses counted from a depth before the string
+  const ends = (s, depth = 0) => {
+    const r = []; let m, d = depth, at = 0;
     TERM.lastIndex = 0;
     while ((m = TERM.exec(s))) {
       const i = m.index;
+      d = parens(s.slice(at, i), d); at = i;
       if (s[i] === '.' && (s[i - 1] === '.' || ABBR.test(s.slice(0, i)))) continue;
+      if (s[i] === '?' && d > 0) continue;
       r.push(i + m[0].length);
     }
     return r;
   };
-  // a line cut into its sentence pieces [{ t, si }], counting in st
+  // a line cut into its sentence pieces [{ t, si }], counting in st (the
+  // sentence number and the parentheses left open, across the run's lines)
   const cut = (s, st) => {
     const pieces = []; let at = 0;
     const push = (t) => { pieces.push({ t, si: st.si }); if (words(t)) st.open = true; };
-    for (const end of ends(s)) { push(s.slice(at, end)); at = end; st.si++; st.open = false; }
+    for (const end of ends(s, st.depth || 0)) { push(s.slice(at, end)); at = end; st.si++; st.open = false; }
     if (at < s.length) push(s.slice(at));
+    st.depth = parens(s, st.depth || 0);
     return pieces;
   };
   // a line's class by its first characters, as SYNTAX says

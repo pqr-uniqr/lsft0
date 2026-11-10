@@ -30,7 +30,10 @@
 //       caret when it is in view, else the page's center as the reader
 //       does; its taps move the cursor, and Tab and Shift+Tab step the
 //       layers from the cursor's; the player, open, has the keys; a
-//       re-render stops a flash.
+//       re-render stops a flash. the file has a B side,
+//       rejects.GENESIS.txt, edited by the same page: ⌘↩ in visual mode
+//       cuts the selection and appends it there, a block of its own, and
+//       Backspace in normal mode switches sides (writing first).
 //
 // mycelium already threads the underscores: a request at L3 reads its
 // genes from /_/_/_/_/.node and /_/_/_/_/vvill/.node (the substrate of the
@@ -80,7 +83,8 @@ const M = require('./atmosphere').register('genesis.model.js');
 const B = require('./atmosphere').register('genesis.bar.js');
 const F = require('./atmosphere').register('genesis.flash.js');
 const TW = 55; // the Lore's hard wrap
-const FILE = '/vvill/GENESIS.txt'; // the one file this editor is for
+const FILE = '/vvill/GENESIS.txt', BSIDE = '/vvill/rejects.GENESIS.txt'; // the file this editor is for, and its B side
+const FILES = [FILE, BSIDE], other = (p) => p === FILE ? BSIDE : FILE;
 
 // the path's segments: substrate underscores as they are, the directories
 // linked at the interface, the file last
@@ -110,7 +114,7 @@ const page = (xface, subgenes, petri, dress) => {
   const local = petri.pathology.spore.isLocal();
   const esc = K.esc;
   const html = dress.loops ? loops(K.blocksHtml(f)) : K.blocksHtml(f);
-  const body = `<div id="vwrap"><div class="vvill-conscious vim" id="conscious" data-path="${esc(ipath)}" data-save="${esc(cpath.replace(/\/[^/]*$/, '') + '/.save')}" data-tw="${TW}">${html}</div>`
+  const body = `<div id="vwrap"><div class="vvill-conscious vim" id="conscious" data-path="${esc(ipath)}"${dress.bside ? ' data-bside="' + esc(other(ipath)) + '"' : ''} data-save="${esc(cpath.replace(/\/[^/]*$/, '') + '/.save')}" data-tw="${TW}">${html}</div>`
     + `<div id="vline"></div><div id="ruler"></div><div id="vhl"></div><div id="caret" class="normal"></div><div id="vsel"></div><textarea id="vin" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"></textarea></div>`
     + `<div class="vim-stat"><span id="vmode"></span><span id="vpos"></span></div>`;
   const script = local ? `<script type="application/json" id="text">${JSON.stringify(raw).replace(/</g, '\\u003c')}</script>`
@@ -125,7 +129,7 @@ const ZOOM_HEAD = '<script>try { const z = localStorage.getItem("vim.zoom:" + lo
 function conscious(xface, subgenes, petri) { return page(xface, subgenes, petri, { styles: DRESS, css: VIM_CSS }); }
 
 // 📄 L4: the surface expression as vim, the reader's organs along
-function surface(xface, subgenes, petri) { return page(xface, subgenes, petri, { styles: {}, css: SURFACE_CSS, loops: true, bar: true }); }
+function surface(xface, subgenes, petri) { return page(xface, subgenes, petri, { styles: {}, css: SURFACE_CSS, loops: true, bar: true, bside: true }); }
 
 // 📮 save: the whole file, written only if it still holds what the page
 // loaded (else 409 with the text on disk, and the page says :e!).
@@ -133,9 +137,15 @@ async function save(body, petri) {
   const json = (status, o) => ({ status, headers: { 'Content-Type': 'application/json; charset=utf-8' }, body: JSON.stringify(o) });
   if (!petri.pathology.spore.isLocal()) return json(403, { ok: false, reason: 'not local' });
   let q; try { q = JSON.parse(body); } catch (e) { return json(400, { ok: false, reason: 'not json' }); }
-  const { path, was, now } = q;
-  if (path !== FILE) return json(400, { ok: false, reason: 'not ' + FILE });
-  if (!(await petri.zone.if(path))) return json(404, { ok: false, reason: 'no such file' });
+  const { path, was, now, append } = q;
+  if (!FILES.includes(path)) return json(400, { ok: false, reason: 'not ' + FILES.join(' or ') });
+  const there = await petri.zone.if(path);
+  if (typeof append === 'string') { // a block onto the end of a side (the side made if it is not there)
+    const raw = there ? await petri.zone.rd8(path) : '', block = append.replace(/^\n+|\n+$/g, '') + '\n';
+    if (!block.trim()) return json(400, { ok: false, reason: 'nothing to append' });
+    await petri.zone.wr(path, raw + (raw === '' || raw.endsWith('\n\n') ? '' : raw.endsWith('\n') ? '\n' : '\n\n') + block);
+    const lines = block.split('\n').length - 1; log.line(`⌨️ ${path} +${lines} lines appended`); return json(200, { ok: true, lines }); }
+  if (!there) return json(404, { ok: false, reason: 'no such file' });
   const raw = await petri.zone.rd8(path);
   if (typeof was !== 'string' || raw !== was) return json(409, { ok: false, reason: 'the file changed on disk since the page loaded', text: raw });
   if (typeof now !== 'string') return json(400, { ok: false, reason: 'no text' });
@@ -271,7 +281,7 @@ const VIM_JS = String.raw`(() => {
   // textbox that holds the keyboard, and a status line. the buffer is one
   // string; the cursor an offset into it; lines are found by their starts.
   const wrap = document.getElementById('vwrap'), root = document.getElementById('conscious'),
-    path = root.dataset.path, caret = document.getElementById('caret'), selbox = document.getElementById('vsel'), ruler = document.getElementById('ruler'), vline = document.getElementById('vline'), hlbox = document.getElementById('vhl'),
+    path = root.dataset.path, bside = root.dataset.bside || null, caret = document.getElementById('caret'), selbox = document.getElementById('vsel'), ruler = document.getElementById('ruler'), vline = document.getElementById('vline'), hlbox = document.getElementById('vhl'),
     ta = document.getElementById('vin'), left = document.getElementById('vmode'), right = document.getElementById('vpos'), bar = document.querySelector('.vvill-bar');
   const raw = JSON.parse(document.getElementById('text').textContent);
   const eol = raw.endsWith('\n');
@@ -355,8 +365,12 @@ const VIM_JS = String.raw`(() => {
   // the dresses scale by --vz
   const ZKEY = 'vim.zoom:' + location.pathname; let zoom = 1;
   try { zoom = Math.min(4, Math.max(0.5, +localStorage.getItem(ZKEY) || 1)); } catch (e) {}
-  const zoomBy = (d) => { zoom = Math.min(4, Math.max(0.5, Math.round((zoom + d) * 20) / 20)); document.documentElement.style.setProperty('--vz', zoom);
-    try { localStorage.setItem(ZKEY, zoom); } catch (e) {} say(Math.round(zoom * 100) + '%'); measure(); place(); };
+  // the caret keeps its place on the screen across a step: the view is
+  // moved by what the text above it grew or shrank
+  const zoomBy = (d) => { const r = rectOf(cur), keep = r ? r.top : null;
+    zoom = Math.min(4, Math.max(0.5, Math.round((zoom + d) * 20) / 20)); document.documentElement.style.setProperty('--vz', zoom);
+    try { localStorage.setItem(ZKEY, zoom); } catch (e) {} say(Math.round(zoom * 100) + '%'); measure();
+    const q = keep === null ? null : rectOf(cur); if (q) { settle(); window.scrollTo(0, scrollY + q.top - keep); } place(); };
 
   // ---- the view: every scroll is one eased glide toward an aim, so a key
   // pressed mid-glide reckons from where the view is heading, not where it is;
@@ -670,6 +684,7 @@ const VIM_JS = String.raw`(() => {
         case 'V': if (mode === 'vline') { mode = 'normal'; cur = clampNormal(cur); } else mode = 'vline'; changed(); return true;
         case 'o': { const a = anchor; anchor = cur; cur = a; place(); return true; }
         case 'd': case 'x': case '<Del>': mode = 'normal'; operate('d', sp); return true;
+        case '<D-CR>': { if (!bside) break; mode = 'normal'; operate('d', sp); reject(reg.text); return true; }
         case 'c': case 's': mode = 'normal'; operate('c', sp); return true;
         case 'y': mode = 'normal'; operate('y', sp); return true;
         case 'J': { mode = 'normal'; snap(); const la = lineOf(sp.a), lb = Math.max(la + 1, lineOf(Math.max(sp.a, sp.b - 1))); cur = starts[la]; join(lb - la); return true; }
@@ -733,6 +748,7 @@ const VIM_JS = String.raw`(() => {
         const m = motion(t, i, { n: c1, op: false }); if (m && m !== 'wait') move(m); return run(keys = t.slice(i + 1)); }
       case 'Z': { if (t[i + 1] === undefined) return 'wait'; if (t[i + 1] === 'Z') ex('x'); else if (t[i + 1] === 'Q') ex('q!'); return true; }
       case '-': case '=': zoomBy((k === '=' ? 1 : -1) * 0.05 * n); return true;
+      case '<BS>': if (bside) { flip(); return true; } break;
       // Tab and Shift+Tab step the page's structure when the page offers one
       // (the L4's layers): the page names the line n steps on or back, the
       // editor sets the cursor on it, the line under the bar
@@ -813,6 +829,20 @@ const VIM_JS = String.raw`(() => {
     savedRaw = now; say('"' + path.split('/').pop() + '" ' + starts.length + 'L, ' + new TextEncoder().encode(now).length + 'B written'); if (then) then();
   }
   const leaveTo = () => { window.onbeforeunload = null; location.href = path; };
+  // the B side (the L4's rejects.GENESIS.txt, and from there GENESIS.txt):
+  // ⌘↩ in visual mode cuts the selection (to the register too) and
+  // appends it to the other side on the server, a block of its own; the
+  // cut is in the buffer's undo, the append is done. Backspace in normal
+  // mode goes to the other side's page, writing first if the buffer is
+  // modified (a write refused keeps the page)
+  async function reject(s) {
+    const name = bside.split('/').pop(); say('→ ' + name + '…');
+    let o; try { const r = await fetch(root.dataset.save, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: bside, append: s }) }); o = await r.json(); }
+    catch (x) { say('E: ' + name + ': ' + x.message + ' · the text is in the register'); return; }
+    if (!o.ok) { say('E: ' + name + ': ' + (o.reason || 'not appended') + ' · the text is in the register'); return; }
+    say(o.lines + (o.lines === 1 ? ' line → ' : ' lines → ') + name);
+  }
+  const flip = () => { const go = () => { window.onbeforeunload = null; location.href = location.pathname.replace(/[^/]*$/, bside.split('/').pop()); }; if (modified()) write(go); else go(); };
   function ex(c) {
     c = c.trim(); let m;
     if ((m = c.match(/^(%|'<,'>|[\d.$+\-,]*)s([^A-Za-z0-9\s])(.*)$/))) {
@@ -849,7 +879,7 @@ const VIM_JS = String.raw`(() => {
 
   // ---- the keyboard
   const NAMES = { Escape: '<Esc>', Enter: '<CR>', Backspace: '<BS>', Tab: '<Tab>', Delete: '<Del>', ArrowLeft: '<Left>', ArrowRight: '<Right>', ArrowUp: '<Up>', ArrowDown: '<Down>', Home: '<Home>', End: '<End>', PageUp: '<PageUp>', PageDown: '<PageDown>' };
-  const nameOf = (e) => { const k = e.key; if (NAMES[k]) return k === 'Tab' && e.shiftKey ? '<S-Tab>' : NAMES[k]; if (k.length !== 1) return null;
+  const nameOf = (e) => { const k = e.key; if (NAMES[k]) return k === 'Tab' && e.shiftKey ? '<S-Tab>' : k === 'Enter' && e.metaKey ? '<D-CR>' : NAMES[k]; if (k.length !== 1) return null;
     if (e.ctrlKey) return '<C-' + k.toLowerCase() + '>'; if (e.metaKey) return '<D-' + k.toLowerCase() + '>'; return k; };
   const CTRL = new Set(['<C-r>', '<C-d>', '<C-u>', '<C-f>', '<C-b>', '<C-e>', '<C-y>', '<C-[>', '<C-c>']);
   // the page's player (the L4's flash readers'), when open, has the keys
@@ -858,6 +888,7 @@ const VIM_JS = String.raw`(() => {
     if (e.isComposing || e.keyCode === 229 || busy()) return;
     const k = nameOf(e); if (!k) return;
     if (k === '<D-s>') { e.preventDefault(); ex('w'); return; }
+    if (k === '<D-CR>') { if (bside && (mode === 'visual' || mode === 'vline')) { e.preventDefault(); feed(k); } return; }
     if (k.startsWith('<D-')) return;
     if (mode === 'insert') {
       if (k.length === 1 && !e.ctrlKey && !e.altKey) { e.preventDefault(); typed(k); return; }
@@ -905,6 +936,7 @@ const VIM_JS = String.raw`(() => {
     send: (s) => { const toks = s.match(/<[^>]+>|[^]/g) || []; for (const t of toks) { let m;
       if ((m = t.match(/^<C-(.)>$/))) ta.dispatchEvent(new KeyboardEvent('keydown', { key: m[1], ctrlKey: true, cancelable: true }));
       else if ((m = t.match(/^<S-(.+)>$/))) ta.dispatchEvent(new KeyboardEvent('keydown', { key: KEYS['<' + m[1] + '>'] || m[1], shiftKey: true, cancelable: true }));
+      else if ((m = t.match(/^<D-(.+)>$/))) ta.dispatchEvent(new KeyboardEvent('keydown', { key: KEYS['<' + m[1] + '>'] || m[1], metaKey: true, cancelable: true }));
       else ta.dispatchEvent(new KeyboardEvent('keydown', { key: KEYS[t] || t, cancelable: true })); } } };
 })();`;
 

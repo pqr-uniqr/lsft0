@@ -61,15 +61,18 @@ const model = (text) => {
   const TERM = /[.?!]["')\]]*(?=\s|$)/g, ABBR = /(?:^|[\s(])(?:e\.g|i\.e|etc|vs|cf)$/i;
   const LEAD = /^\s*(?:[>~+\-=|.,^$@\/\\!]|[a-z]:|x+ )?\s*/i;
   const words = (t) => t.match(LEAD)[0].length < t.length; // a word past any sigil
-  const ends = (s) => { // the offsets just past each terminal
-    const r = []; let m; TERM.lastIndex = 0;
-    while ((m = TERM.exec(s))) { const i = m.index; if (s[i] === '.' && (s[i - 1] === '.' || ABBR.test(s.slice(0, i)))) continue; r.push(i + m[0].length); }
+  const parens = (s, d = 0) => { for (const ch of s) if (ch === '(') d++; else if (ch === ')' && d > 0) d--; return d; }; // the depth after a string
+  const ends = (s, depth = 0) => { // the offsets just past each terminal; a ? inside parentheses is none
+    const r = []; let m, d = depth, at = 0; TERM.lastIndex = 0;
+    while ((m = TERM.exec(s))) { const i = m.index; d = parens(s.slice(at, i), d); at = i;
+      if (s[i] === '.' && (s[i - 1] === '.' || ABBR.test(s.slice(0, i)))) continue; if (s[i] === '?' && d > 0) continue; r.push(i + m[0].length); }
     return r;
   };
-  const cut = (s, st) => { // a line into its sentence pieces, counting in st
+  const cut = (s, st) => { // a line into its sentence pieces, counting in st (the number, and the parentheses open across the run)
     const pieces = []; let at = 0;
-    for (const end of ends(s)) { pieces.push({ t: s.slice(at, end), si: st.si }); at = end; st.si++; }
+    for (const end of ends(s, st.depth || 0)) { pieces.push({ t: s.slice(at, end), si: st.si }); at = end; st.si++; }
     if (at < s.length) pieces.push({ t: s.slice(at), si: st.si });
+    st.depth = parens(s, st.depth || 0);
     return pieces;
   };
   const classOf = (line, next) => {
