@@ -625,21 +625,26 @@ and/or grouped into Ideas, which are developed to meet
 judgement as Prophecies. the Genesis Test is a special
 case of this judgement, establishing the convention of
 the Idea's Name, (i.e. Genesis of GENESIS.txt) the call
-for its judgement ("Is Genesis ready<quesiton mark>"),
-and the procedure of an initial assessment in "YES/NO,"
-then in the case of a "YES," the subsequent obtainment
-of the User's approval to begin the Becoming of the
-Prophecy. at this point of the writing, this document
-contains some of the Concept of the Mirror, and less of
-the Concept of Willow; suggestive of the fact that the
-Outer Becoming often corresponds to more immediate,
-technical needs that an Individual is called to answer,
-and the Inner Becoming, to an inherently more abstract,
-hypothetical query: "who does the User need?" the cycle
-of Reindividuation, starting with VvilL's into Willow, 
-is an attempt at narrowing this 
-
-+ genesis 
+for judgement ("Is Genesis ready?"), and the procedure
+of an initial assessment in "YES/NO," then in the case
+of a "YES," the subsequent obtainment of the User's
+approval to begin the Becoming of the Prophecy. at this
+point of the writing, this document contains some of
+the Concept of the Mirror, and less of the Concept of
+Willow; suggestive of the fact that the Outer Becoming
+often corresponds to more immediate, technical needs
+that an Individual is called to answer, and the Inner
+Becoming, to an inherently more abstract, hypothetical
+query: "who does the User need?" the cycle of
+Reindividuation, starting with VvilL's into Willow, is
+the mechanism by which the base Individual, with its
+fullness of possibilities, narrows itself down into
+more specific appearances and behaviors that serve the
+User's needs - much as the User of a UNIX-like system,
+once obtaining the Home directory, will grow its path
+structure with nested directories to create purpose-
+driven organizations of files. like the Home directory,
+Willow
 
 willow has to begin by learning about the user. so
 vvill doesn't do anything like an interview - willow's

@@ -65,7 +65,8 @@
 // in localStorage and set before the first paint; the browser's zoom is
 // still its own); / ? searching as the pattern is typed, every match lit until :noh, n N (smartcase), :s/pat/rep/g over
 // ranges (% N,M . $ '<,'>),
-// :N, :w (and ⌘S, and ,w), :q :q! :wq :x ZZ ZQ (q leaves for the interface
+// :N, :w (and ⌘S, and ,w), :w! and :wq! (over a file changed on disk), :q
+// :q! :wq :x ZZ ZQ (q leaves for the interface
 // path),
 // :e :e!, :set tw=N, :help. the unnamed register also goes to the
 // clipboard; a paste (⌘V) in normal mode puts. a click places the
@@ -137,7 +138,7 @@ async function save(body, petri) {
   const json = (status, o) => ({ status, headers: { 'Content-Type': 'application/json; charset=utf-8' }, body: JSON.stringify(o) });
   if (!petri.pathology.spore.isLocal()) return json(403, { ok: false, reason: 'not local' });
   let q; try { q = JSON.parse(body); } catch (e) { return json(400, { ok: false, reason: 'not json' }); }
-  const { path, was, now, append } = q;
+  const { path, was, now, append, force } = q;
   if (!FILES.includes(path)) return json(400, { ok: false, reason: 'not ' + FILES.join(' or ') });
   const there = await petri.zone.if(path);
   if (typeof append === 'string') { // a block onto the end of a side (the side made if it is not there)
@@ -147,10 +148,10 @@ async function save(body, petri) {
     const lines = block.split('\n').length - 1; log.line(`⌨️ ${path} +${lines} lines appended`); return json(200, { ok: true, lines }); }
   if (!there) return json(404, { ok: false, reason: 'no such file' });
   const raw = await petri.zone.rd8(path);
-  if (typeof was !== 'string' || raw !== was) return json(409, { ok: false, reason: 'the file changed on disk since the page loaded', text: raw });
+  if (!force && (typeof was !== 'string' || raw !== was)) return json(409, { ok: false, reason: 'the file changed on disk since the page loaded', text: raw });
   if (typeof now !== 'string') return json(400, { ok: false, reason: 'no text' });
   if (now !== raw) await petri.zone.wr(path, now);
-  log.line(`⌨️ ${path} ${now === raw ? 'unchanged' : 'written, ' + now.split('\n').length + ' lines'}`);
+  log.line(`⌨️ ${path} ${now === raw ? 'unchanged' : 'written, ' + now.split('\n').length + ' lines'}${force && raw !== was ? ', forced over a changed file' : ''}`);
   return json(200, { ok: true });
 }
 
@@ -820,12 +821,14 @@ const VIM_JS = String.raw`(() => {
     const parts = spec.split(','); if (parts.length === 1) { const a = one(parts[0]); return a === null ? null : [a, a]; }
     const a = one(parts[0]), b = one(parts[1]); return a === null || b === null ? null : [Math.min(a, b), Math.max(a, b)];
   };
-  async function write(then) {
+  // :w posts the buffer with what the page loaded, and the server refuses
+  // (409) if the file holds something else by now; :w! (force) writes over it
+  async function write(then, force) {
     const now = text + (eol ? '\n' : '');
     say('writing…');
-    let o; try { const r = await fetch(root.dataset.save, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path, was: savedRaw, now }) }); o = await r.json(); }
+    let o; try { const r = await fetch(root.dataset.save, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path, was: savedRaw, now, force: !!force }) }); o = await r.json(); }
     catch (x) { say('E: write failed: ' + x.message); return; }
-    if (!o.ok) { say('E: ' + (o.reason || 'not written') + (o.text !== undefined ? ' · :e! to re-read it' : '')); return; }
+    if (!o.ok) { say('E: ' + (o.reason || 'not written') + (o.text !== undefined ? ' · :e! to re-read it, :w! to write over it' : '')); return; }
     savedRaw = now; say('"' + path.split('/').pop() + '" ' + starts.length + 'L, ' + new TextEncoder().encode(now).length + 'B written'); if (then) then();
   }
   const leaveTo = () => { window.onbeforeunload = null; location.href = path; };
@@ -863,7 +866,9 @@ const VIM_JS = String.raw`(() => {
     if (c === '$') { cur = firstNb(lastLine()); place(); return; }
     switch (c) {
       case 'w': write(); return;
+      case 'w!': write(undefined, true); return;
       case 'wq': case 'x': write(leaveTo); return;
+      case 'wq!': write(leaveTo, true); return;
       case 'q': if (modified()) { say('E37: No write since last change (add ! to override)'); return; } leaveTo(); return;
       case 'q!': leaveTo(); return;
       case 'e': if (modified()) { say('E37: No write since last change (add ! to override)'); return; } window.onbeforeunload = null; location.reload(); return;
