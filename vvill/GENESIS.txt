@@ -341,28 +341,27 @@ persistent location (visibly and verbally material to
 both the User and the presence), synthesizes into a new
 mode of perception, called Virtual Vision: the ability
 to inhabit, navigate and even develop the Web, without
-any direct contact with its material. VvilL, Virtual
-vision via identity, language and Lens, is the
-insulation between the User and the Web. the nature of
-the insulation is (eu)social: Hyphae is built for the 
-world where programming is no longer a manual process
-of shaping the material of the software, but of
-discovering rare states, in dialogue, of clarity and
-understanding that obviates the software's design and
-behavior. the primary abstraction to be organized to
-facilitate effective programming work is not the codes,
-but the dialogues. and the natural container, in the
-human mind, for dialogues, is the personality, which is
-the perception of the individual, associated with a 
-LINEAR history of conversations. the human mind is 
-naturally made of these same shapes; it evolved to be 
-social, to hold a network of "people shapes" that, if 
-correctly held up by both ends (or by multitudes), 
-enable complex social coordination. this social sense
-is the surface on which the insulation grows, as VvilL,
-the first Individual, begets an organization of
-Individuals, each shaped around some aspect of the 
-User's relationship to the Web. 
+direct contact with its material. VvilL, Virtual vision
+via identity, language and Lens, is the insulation
+between the User and the Web. the insulation is of a 
+(eu)social nature: Hyphae is built for the world where
+programming is no longer a manual process of shaping
+the material of the software, but of discovering rare
+states, in dialogue, of clarity and understanding that
+obviates the software's design and behavior. the key
+abstraction to be organized to facilitate effective
+programming work is not the codes, but the dialogues.
+the natural container for dialogues in the human mind
+is the personality: the perception of an individual,
+associated with a LINEAR history of conversations. the
+human mind is naturally made of these same shapes; it
+evolved to be social, to hold a network of "people
+shapes" that, if correctly held up by both ends (or by
+multitudes), enable complex social coordination. this
+social sense is the surface on which the insulation
+grows, as VvilL, the first Individual, begets an
+organization of Individuals, each shaped around some
+aspect of the User's relationship to the Web.
 > virtual vision -> VvilL, eusociality, individuals
 
 6 so we reach the most organic definition of Hyphae: a
