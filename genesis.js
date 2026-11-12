@@ -28,9 +28,8 @@
 //       and the layer in view (genesis.bar.js), that layer boxed, and
 //       the flash readers (genesis.flash.js), reading the model
 //       (genesis.model.js) live from the buffer; with the L3's pane, 56
-//       columns and centered, its ruler, red, the caret's marks: a
-//       crosshair through it, two hairlines across the view, and the
-//       coil it is on underlined. the bar tracks the
+//       columns and centered, its ruler, red, the caret's mark: a
+//       crosshair through it, two hairlines across the view. the bar tracks the
 //       caret when it is in view, else the page's center as the reader
 //       does; its taps switch the scheme; Tab and Shift+Tab step the
 //       layers from the cursor's, the layer's first line set in the
@@ -110,7 +109,7 @@ const crumb = (cpath, ipath) => {
 // whether the loop headers stand as the primary's view has them, whether
 // the reader's organs come along (the bar, the flash readers and the
 // schemes, on the model, read live), whether the file has a B side, and
-// whether the caret has its marks (the crosshair, the coil's underline).
+// whether the caret has its mark (the crosshair).
 // off the LAN, the blocks, read only.
 const page = (xface, subgenes, petri, dress) => {
   const { cpath, ipath } = petri.pathology;
@@ -124,7 +123,7 @@ const page = (xface, subgenes, petri, dress) => {
   const esc = K.esc;
   const html = dress.loops ? loops(K.blocksHtml(f)) : K.blocksHtml(f);
   const body = `<div id="vwrap"><div class="vvill-conscious vim" id="conscious" data-path="${esc(ipath)}"${dress.bside ? ' data-bside="' + esc(other(ipath)) + '"' : ''} data-save="${esc(cpath.replace(/\/[^/]*$/, '') + '/.save')}" data-tw="${TW}">${html}</div>`
-    + `<div id="vline"></div><div id="ruler"></div>${dress.marks ? '<div id="vcoil"></div>' : ''}<div id="vhl"></div><div id="caret" class="normal"></div><div id="vsel"></div>${dress.marks ? '<div id="xh"></div><div id="xv"></div>' : ''}<textarea id="vin" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"></textarea></div>`
+    + `<div id="vline"></div><div id="ruler"></div><div id="vhl"></div><div id="caret" class="normal"></div><div id="vsel"></div>${dress.marks ? '<div id="xh"></div><div id="xv"></div>' : ''}<textarea id="vin" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"></textarea></div>`
     + `<div class="vim-stat"><span id="vmode"></span><span id="vpos"></span></div>`;
   const script = local ? `<script type="application/json" id="text">${JSON.stringify(raw).replace(/</g, '\\u003c')}</script>`
     + `<script>const K = (${V.KERNEL})({ links: false });\n${dress.loops ? LOOPS_JS : ''}${VIM_JS}</script>`
@@ -217,9 +216,7 @@ const LOOPS_JS = `${loops.toString()}\n{ const bh = K.blockHtml; K.blockHtml = (
 // the L4's ground for the reader's organs: window.genesis with the model
 // read live from the editor's buffer (rebuilt when it changed), the probe
 // the bar tracks by (the caret, when it is in view, else the page's
-// center as the reader has it), the coil the caret is on (the model's
-// sentence at the offset, its span, for the underline; none in the
-// title art), the bar's taps
+// center as the reader has it), the bar's taps
 // taken for the scheme (the next one, said on the status line), the bar's moves (nextLoop,
 // nextLayer) carried out as the editor's own motions: the next loop or
 // layer after the cursor's line, the cursor set on its first line, the
@@ -237,7 +234,6 @@ const GLUE_JS = /* js */ `(() => {
     go: (bs) => { const l = vim.line, b = bs.find(b => b.line > l) || bs[0];
       if (vim.mode !== 'normal') vim.send('<Esc>'); vim.send(':' + (b.line + 1) + '<CR>zz'); },
     tap: () => g.scheme.next(), say: (m) => vim.say(m),
-    coil: (o) => { const p = g.doc.at(o), s = p && p.block.role !== 'header' && p.sentence; return s && s.end > s.start ? { a: s.start, b: s.end } : null; },
     step: (n) => { const doc = g.doc, ys = doc.loops.flatMap(l => l.layers), L = ys.length; if (!L) return null;
       const l = vim.line, p = doc.atLine(l);
       let i = p && p.layer !== undefined ? ys.findIndex(y => y.loop === p.loop && y.n === p.layer) : -1;
@@ -256,8 +252,7 @@ const GLUE_JS = /* js */ `(() => {
 // through; the matches underlined red; the caret a red block with its
 // glyph inverted (cyan, in difference: cyan over the white page), an
 // insert bar red; the crosshair two red hairlines, half seen, fixed in
-// the view and moved with the caret, under the text; the coil the
-// caret is on underlined in the ink, a little faded. under the ctrl
+// the view and moved with the caret, under the text. under the ctrl
 // and navy schemes (genesis.scheme.js) the overlays take the scheme's
 // own: ctrl the L3's, navy a deeper blue band, a wine selection, a
 // white caret inverting what it covers, the matches underlined white.
@@ -275,9 +270,8 @@ const SURFACE_CSS = /* css */ `
   #conscious .blk { margin: 0; }
   #conscious .g { opacity: 1; font-weight: bold; }
   #vwrap { position: relative; isolation: isolate; }
-  #vline, #ruler, #vcoil div, #vsel div, #vhl div { position: absolute; pointer-events: none; z-index: -1; }
+  #vline, #ruler, #vsel div, #vhl div { position: absolute; pointer-events: none; z-index: -1; }
   #vline { left: -16px; right: -16px; background: #f0f0f0; }
-  #vcoil div { border-bottom: 1px solid currentColor; box-sizing: border-box; opacity: 0.7; }
   #ruler { top: 0; bottom: 0; width: 0; border-left: 1px solid #ff0000; }
   #vsel div { background: #ffc4c4; }
   #vhl div { border-bottom: 2px solid #ff0000; box-sizing: border-box; }
@@ -438,7 +432,7 @@ const VIM_JS = String.raw`(() => {
     cross();
     const top = r.top + scrollY, bot = top + h, vt = viewTop();
     if (top < vt + inset() + pad()) glide(top < inset() + 2 * pad() ? 0 : top - inset() - pad()); else if (bot > vt + viewH() - pad()) glide(bot - viewH() + pad());
-    selection(); hilite(); coil(); status();
+    selection(); hilite(); status();
     if (window.genesis && window.genesis.inView) window.genesis.inView(); // the bar follows the caret
   }
   const selRange = () => {
@@ -485,10 +479,6 @@ const VIM_JS = String.raw`(() => {
       for (const c of r.getClientRects()) if (c.width > 0) { const d = document.createElement('div');
         d.style.cssText = 'left:' + (c.left - w.left) + 'px;top:' + (c.top - w.top + (c.height - lh) / 2) + 'px;width:' + c.width + 'px;height:' + lh + 'px'; into.appendChild(d); } }
   };
-  // the coil the cursor is on (the L4's): the sentence the page finds at
-  // the cursor, underlined
-  const coilbox = document.getElementById('vcoil');
-  function coil() { if (!coilbox) return; coilbox.innerHTML = ''; const g = window.genesis, s = g && g.coil ? g.coil(cur) : null; if (s) spanBoxes(s.a, s.b, coilbox, wrap.getBoundingClientRect()); }
   function status() {
     const p = path.split('/').pop();
     if (mode === 'cmd') left.textContent = cmd;

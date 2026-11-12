@@ -43,7 +43,7 @@ const CTRL = { bg: '#2d0549', ink: '#ef4811', link: '#d9baff', rule: '#5a2a7a', 
 // navy: the dark blue page, the sentences red and yellow in turn, the
 // rest a pale blue-white, the blues of ctrl's numbers lifted off the
 // page; ctrl's font, leading and tracking
-const NAVY = { bg: '#0d253b', ink: '#d8e0ff', s0: '#ff0000', s1: '#ffff11', link: '#8ab4ff', rule: '#3b5fc0', band: '#142a5c', sel: '#703030', match: '#ffffff', caret: '#ffffff',
+const NAVY = { bg: '#0d253b', ink: '#d8e0ff', s0: '#ff0000', s1: '#888888', link: '#8ab4ff', rule: '#3b5fc0', band: '#142a5c', sel: '#703030', match: '#ffffff', caret: '#ffffff',
   pos: '#8a9bc8', d5: '#6f8fff', d6: '#a070ff', font: FONT, size: CTRL.size, fit: CTRL.fit, lead: CTRL.lead, track: CTRL.track, em: CTRL.em };
 
 // a scheme's rules under its attribute, each selector of a list prefixed
