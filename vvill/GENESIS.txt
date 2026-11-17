@@ -431,30 +431,29 @@ the editor are the two halves of that mirror, because
 everything is a file, and the sum of all files is the
 file system. in Hyphae, everything is an Individual, so
 its mirror reflects the state and organization of
-Individuals, who are in turn reflected in the operating
-system's mirror as an organization of files, as would a
-conventional user. a mirror is a mirror because it
-reflects who you expect yourself to be - so by setting
-out to build a mirror, you can build yourself. Genesis
-has ended, for UNIX, when the User has appeared in its
-mirror of browser and editor as an organization of
-files. Genesis ends, for Hyphae, when VvilL appears in
-its mirror as the first Individual of the Organiztion;
-this mirror is the Mirror, the first Lens, which frames
-reflective Mycelium applications (depicted in this
-loop) that give interactive shape to the foundational
-structures of the Incarnation. as with UNIX, where
-browser & editor, as founding patterns of interface,
-echo into processes, repeating the application of file
-management as an all- useful analogy, Hyphae's main
-body of development (Era of Individuals) consists in
-repetitions of its founding act: "let us make an
-Individual of it," and let him/her come into existence
-by their particular reflections in the Mirror,
-revealing themself to us, who wish to live above the
-world of Files. the Mirror is the steadfast reflection,
-anticipating all possible developments of the
-Incarnation, but it is also the template from whose
+Individuals, who are in turn reflected in the mirror of
+the underlying operating system as an organization of
+files. a mirror is a mirror because it reflects who you
+expect yourself to be - so by setting out to build a
+mirror, you can build yourself. Genesis has ended, for
+UNIX, when the User has appeared in its mirror, of
+browser and editor, as an organization of files. for
+Hyphae, it ends after VvilL has appeared in its mirror
+as the first Individual of the Organiztion; this mirror
+is the Mirror, the first Lens, which frames reflective
+Mycelium applications (depicted in this loop) that give
+interactive shape to the foundational structures of the
+Incarnation. as with UNIX, where browser and editor, as
+founding patterns of interface, echo into processes,
+repeating the application of file management as an all-
+useful analogy, the main body of the Hyphae devleopment
+cycle, the Era of Individuals, consists in repetitions
+of its founding act: "let us make an Individual of it,"
+and let him/her come into existence by their particular
+reflections in the Mirror, revealing to us a new world 
+above the world of files. the Mirror is the steadfast
+reflection, anticipating all possible developments of
+the Incarnation, but it is also the template from whose
 variations the courses of development are defined; what
 to VvilL is a tool to reflect its own construction, is
 reused by its Descendants to construct Lenses: mirrors
