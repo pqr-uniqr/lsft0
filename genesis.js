@@ -1,6 +1,6 @@
-// @ts-nocheck genesis.js - the editors of GENESIS.txt, the one file they
-// edit: the primary's page, driven by a keyboard with vim's bindings, in
-// two dresses at two layers of the substrate.
+// @ts-nocheck genesis.js - the editors of GENESIS.txt (and of
+// IDENTITY.txt, at L3): the primary's page, driven by a keyboard with
+// vim's bindings, in two dresses at three layers of the substrate.
 //
 // every file has layers of representations down the substrate: the plain
 // path is the interface, the primary representation; /_/path is L1, the
@@ -18,6 +18,7 @@
 //       leading and tracking, served from /_fonts. one scheme in either
 //       device mode.
 //   L4  http://vostok.local:8880/_/_/_/_/vvill/GENESIS.txt  surface()
+//   L5  http://vostok.local:8880/_/_/_/_/_/vvill/GENESIS.txt  the same
 //       the surface expression (genesis.reader.js, the primary) as a vim
 //       editor, the two merged: its white page and black and red
 //       sentences, the gutter numbers bold and full, the loop headers in
@@ -39,7 +40,11 @@
 //       cuts the selection and appends it there, a block of its own, and
 //       Backspace in normal mode shows it over the page, read fresh, in
 //       a plain textbox (Escape or Backspace closes it); the B side's
-//       own page has Backspace back to the file (writing first).
+//       own page has Backspace back to the file (writing first). marks:
+//       in visual mode a digit 1 to 9 marks the selection, a bar in its
+//       color down the right margin with the digit, kept per file by its
+//       text; ,1 to ,9 go to them; the digit again over the span clears
+//       it. the L5 serves the same page, where Pete works now.
 //
 // mycelium already threads the underscores: a request at L3 reads its
 // genes from /_/_/_/_/.node and /_/_/_/_/vvill/.node (the substrate of the
@@ -65,7 +70,7 @@
 // i< a<; x X s S C D Y J p P r ~ u ^R and . ; v V with d c y J ~ u U p r gq
 // : and o; i a I A o O, insert's ^W ^U, text breaking at the width as it
 // is typed (never a line already past it); z z/t/b, ^D ^U ^F ^B ^E ^Y,
-// PageDown and PageUp five lines (times a count), every scroll a glide; a ruler
+// PageDown and PageUp eight lines (times a count), every scroll a glide; a ruler
 // after the last column of the width; - and = size the text, finer than
 // the browser's zoom (five percent a step, times a count, kept per page
 // in localStorage and set before the first paint; the browser's zoom is
@@ -92,7 +97,7 @@ const F = require('./atmosphere').register('genesis.flash.js');
 const S = require('./atmosphere').register('genesis.scheme.js');
 const TW = 55; // the Lore's hard wrap
 const FILE = '/vvill/GENESIS.txt', BSIDE = '/vvill/rejects.GENESIS.txt'; // the file this editor is for, and its B side
-const FILES = [FILE, BSIDE], other = (p) => p === FILE ? BSIDE : FILE;
+const FILES = [FILE, BSIDE, '/vvill/IDENTITY.txt'], other = (p) => p === FILE ? BSIDE : FILE;
 
 // the path's segments: substrate underscores as they are, the directories
 // linked at the interface, the file last
@@ -111,7 +116,8 @@ const crumb = (cpath, ipath) => {
 // whether the loop headers stand as the primary's view has them, whether
 // the reader's organs come along (the bar, the flash readers and the
 // schemes, on the model, read live), whether the file has a B side, and
-// whether the caret has its mark (the crosshair).
+// whether the caret has its mark (the crosshair), and whether the right
+// margin takes marks (the surface's).
 // off the LAN, the blocks, read only.
 const page = (xface, subgenes, petri, dress) => {
   const { cpath, ipath } = petri.pathology;
@@ -125,7 +131,7 @@ const page = (xface, subgenes, petri, dress) => {
   const esc = K.esc;
   const html = dress.loops ? loops(K.blocksHtml(f)) : K.blocksHtml(f);
   const body = `<div id="vwrap"><div class="vvill-conscious vim" id="conscious" data-path="${esc(ipath)}"${dress.bside ? ' data-bside="' + esc(other(ipath)) + '" data-side="' + (ipath === FILE ? 'a' : 'b') + '"' : ''} data-save="${esc(cpath.replace(/\/[^/]*$/, '') + '/.save')}" data-tw="${TW}">${html}</div>`
-    + `<div id="vline"></div><div id="ruler"></div><div id="vhl"></div><div id="caret" class="normal"></div><div id="vsel"></div>${dress.marks ? '<div id="xh"></div><div id="xv"></div>' : ''}<textarea id="vin" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"></textarea></div>`
+    + `<div id="vline"></div><div id="ruler"></div><div id="vhl"></div><div id="caret" class="normal"></div><div id="vsel"></div>${dress.cross ? '<div id="xh"></div><div id="xv"></div>' : ''}${dress.marks ? '<div id="vmarks"></div>' : ''}<textarea id="vin" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"></textarea></div>`
     + `<div class="vim-stat"><span id="vmode"></span><span id="vpos"></span></div>`
     + (dress.bside ? `<div id="vside" class="vim-side" hidden><div class="where"></div><textarea readonly spellcheck="false"></textarea></div>` : '');
   const script = local ? `<script type="application/json" id="text">${JSON.stringify(raw).replace(/</g, '\\u003c')}</script>`
@@ -140,7 +146,7 @@ const ZOOM_HEAD = '<script>try { const z = localStorage.getItem("vim.zoom:" + lo
 function conscious(xface, subgenes, petri) { return page(xface, subgenes, petri, { styles: DRESS, css: VIM_CSS }); }
 
 // 📄 L4: the surface expression as vim, the reader's organs along
-function surface(xface, subgenes, petri) { return page(xface, subgenes, petri, { styles: {}, css: SURFACE_CSS, loops: true, bar: true, bside: true, marks: true }); }
+function surface(xface, subgenes, petri) { return page(xface, subgenes, petri, { styles: {}, css: SURFACE_CSS, loops: true, bar: true, bside: true, cross: true, marks: true }); }
 
 // 📮 save: the whole file, written only if it still holds what the page
 // loaded (else 409 with the text on disk, and the page says :e!).
@@ -282,6 +288,8 @@ const SURFACE_CSS = /* css */ `
   #caret.insert { background: #ff0000; mix-blend-mode: normal; }
   #xh, #xv { position: fixed; pointer-events: none; z-index: -1; background: rgba(255, 0, 0, 0.5); }
   #xh { left: 0; right: 0; height: 1px; } #xv { top: 0; bottom: 0; width: 1px; }
+  #vmarks div { position: absolute; width: 0; border-left: 3px solid currentColor; pointer-events: none; }
+  #vmarks span { position: absolute; left: 6px; top: 0; font-size: 0.7em; line-height: 1; }
   #vin { position: absolute; width: 1px; opacity: 0; border: 0; padding: 0; margin: 0; resize: none; outline: 0; font: inherit; overflow: hidden; }
   .vim-stat { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; gap: 1em; padding: 4px 16px;
     border-top: 1px solid #000; background: #fff; color: #000; font-family: ${MONO}; font-size: 0.85em; line-height: 20px; white-space: pre; overflow: hidden; }
@@ -442,7 +450,7 @@ const VIM_JS = String.raw`(() => {
     cross();
     const top = r.top + scrollY, bot = top + h, vt = viewTop();
     if (top < vt + inset() + pad()) glide(top < inset() + 2 * pad() ? 0 : top - inset() - pad()); else if (bot > vt + viewH() - pad()) glide(bot - viewH() + pad());
-    selection(); hilite(); status();
+    selection(); hilite(); drawMarks(); status();
     if (window.genesis && window.genesis.inView) window.genesis.inView(); // the bar follows the caret
   }
   const selRange = () => {
@@ -498,6 +506,40 @@ const VIM_JS = String.raw`(() => {
   }
   const say = (m) => { msg = m; status(); };
   const changed = () => { render(); place(); };
+  // marks (the surface's): in visual mode a digit 1 to 9 marks the selection;
+  // the same digit over a marked span clears the mark, elsewhere moves
+  // it. a mark stands in the right margin as a bar in its color down its
+  // lines, its digit beside; ,1 puts the cursor on mark 1, the view
+  // centered. kept per file in localStorage by their text, found again
+  // when the text moves (the mark's first line is enough); a mark whose
+  // text is gone waits unseen, for an undo
+  const markbox = document.getElementById('vmarks'), MKEY = 'vim.marks:' + path;
+  const MCOLORS = [null, '#ff0000', '#ff8000', '#ffd700', '#00c000', '#00bfff', '#3366ff', '#9933ff', '#ff00ff', '#808080'];
+  let marks = {}; try { marks = JSON.parse(localStorage.getItem(MKEY) || '{}') || {}; } catch (e) { marks = {}; }
+  const keepMarks = () => { try { localStorage.setItem(MKEY, JSON.stringify(marks)); } catch (e) {} };
+  const nearest = (s, near) => { let best = -1, i = text.indexOf(s); while (i >= 0) { if (best < 0 || Math.abs(i - near) < Math.abs(best - near)) best = i; i = text.indexOf(s, i + 1); } return best; };
+  const anchorMarks = () => { let moved = false; for (const n in marks) { const m = marks[n]; if (text.startsWith(m.text, m.a)) { m.lost = false; continue; }
+    let i = nearest(m.text, m.a); if (i < 0) { const head = m.text.split('\n')[0]; i = head.length >= 4 ? nearest(head, m.a) : -1; }
+    if (i < 0) m.lost = true; else { m.a = i; m.b = Math.min(N(), i + m.text.length); m.lost = false; moved = true; } }
+    if (moved) keepMarks(); };
+  function drawMarks() {
+    if (!markbox) return; markbox.innerHTML = ''; anchorMarks();
+    const w = wrap.getBoundingClientRect(), x = w.width + 6;
+    for (const n in marks) { const m = marks[n]; if (m.lost) continue;
+      const la = lineOf(m.a), lb = lineOf(Math.max(m.a, m.b - 1)), ra = lineEl[la] && lineEl[la].getBoundingClientRect(), rb = lineEl[lb] && lineEl[lb].getBoundingClientRect(); if (!ra || !rb) continue;
+      const d = document.createElement('div'); d.style.cssText = 'left:' + x + 'px;top:' + (ra.top - w.top) + 'px;height:' + Math.max(lh, rb.bottom - ra.top) + 'px;color:' + MCOLORS[n];
+      const s = document.createElement('span'); s.textContent = n; d.appendChild(s); markbox.appendChild(d); }
+  }
+  const setMark = (n) => {
+    const sp = selRange(), a = sp.lw ? starts[sp.la] : sp.a, b = sp.lw ? lineEnd(sp.lb) : sp.b, m = marks[n];
+    mode = 'normal'; cur = clampNormal(cur);
+    if (m && !m.lost && m.a < b && a < m.b) { delete marks[n]; say('mark ' + n + ' cleared'); }
+    else { marks[n] = { a, b, text: text.slice(a, b) }; say('mark ' + n + (m ? ' moved' : ' set')); }
+    keepMarks(); changed();
+  };
+  const jumpMark = (n) => { const m = marks[n]; if (!m) { say('no mark ' + n); return; } anchorMarks();
+    if (m.lost) { say('mark ' + n + ' is gone from the text'); return; }
+    cur = clampNormal(m.a); want = col(cur); zmid(); place(); say('mark ' + n); };
 
   // ---- motions: each takes the count and the cursor, says where to go and
   // how the span is cut for an operator (linewise, inclusive, exclusive)
@@ -701,6 +743,7 @@ const VIM_JS = String.raw`(() => {
   }
   function run(t) {
     const vis = mode === 'visual' || mode === 'vline';
+    if (vis && markbox && t.length === 1 && /^[1-9]$/.test(t[0])) { setMark(+t[0]); return true; }
     let { n: c1, i } = count(t, 0);
     if (i >= t.length) return 'wait';
     let op = null;
@@ -774,17 +817,19 @@ const VIM_JS = String.raw`(() => {
       case 'z': { if (t[i + 1] === undefined) return 'wait'; const r = rectOf(cur); if (!r) return true; const y = r.top + scrollY, h = r.height || lh;
         if (t[i + 1] === 'z') zmid(); else if (t[i + 1] === 't') ztop(); else if (t[i + 1] === 'b') glide(y + h - viewH() + pad()); place(); return true; }
       case '<C-d>': case '<C-u>': case '<C-f>': case '<C-b>': case '<PageDown>': case '<PageUp>': { const page = Math.max(1, Math.floor((innerHeight - 40) / lh));
-        const d = Math.max(1, (k === '<C-d>' || k === '<C-u>') ? Math.floor(page / 2) : (k === '<PageDown>' || k === '<PageUp>') ? 5 * n : page - 2);
+        const d = Math.max(1, (k === '<C-d>' || k === '<C-u>') ? Math.floor(page / 2) : (k === '<PageDown>' || k === '<PageUp>') ? 8 * n : page - 2);
         const dir = (k === '<C-d>' || k === '<C-f>' || k === '<PageDown>') ? 1 : -1; glide(viewTop() + dir * d * lh); const l = Math.max(0, Math.min(lastLine(), lineOf(cur) + dir * d)); cur = at(l, want); cur = clampNormal(cur); place(); return true; }
       case '<C-e>': case '<C-y>': { glide(viewTop() + (k === '<C-e>' ? n : -n) * lh); let l = lineOf(cur);
         while (l < lastLine() && lineY(l).top < viewTop() + inset() + pad()) l++; while (l > 0 && lineY(l).bot > viewTop() + viewH() - pad()) l--;
         if (l !== lineOf(cur)) cur = clampNormal(at(l, want)); place(); return true; }
-      // ,w writes (Pete's shortcut). a lone , waits a second for the w, then
+      // ,w writes (Pete's shortcut), ,1 to ,9 go to the marks (the surface's). a
+      // lone , waits a second for the key, then
       // is the motion (the reverse of ;); any other key after it is the
       // motion and then that key, as if typed apart
       case ',': { if (vis) break;
         if (t[i + 1] === undefined) { const snap = t.join(' '); clearTimeout(commaTimer);
           commaTimer = setTimeout(() => { if (keys.join(' ') !== snap) return; keys = []; const m = motion(t, i, { n: c1, op: false }); if (m && m !== 'wait') move(m); status(); }, 1000); return 'wait'; }
+        if (markbox && /^[1-9]$/.test(t[i + 1])) { jumpMark(+t[i + 1]); return true; }
         if (t[i + 1] === 'w') { ex('w'); return true; }
         const m = motion(t, i, { n: c1, op: false }); if (m && m !== 'wait') move(m); return run(keys = t.slice(i + 1)); }
       case 'Z': { if (t[i + 1] === undefined) return 'wait'; if (t[i + 1] === 'Z') ex('x'); else if (t[i + 1] === 'Q') ex('q!'); return true; }
@@ -935,7 +980,7 @@ const VIM_JS = String.raw`(() => {
       case 'e!': window.onbeforeunload = null; location.reload(); return;
       case 'noh': case 'nohlsearch': hl = null; hilite(); return;
       case 'set tw?': case 'set textwidth?': say('  textwidth=' + tw); return;
-      case 'help': say('genesis.js: motions, operators d c y gq, objects, v V, u ^R ., / n *, :w ,w :q :s :N :noh :set tw='); return;
+      case 'help': say('genesis.js: motions, operators d c y gq, objects, v V, u ^R ., / n *, :w ,w :q :s :N :noh :set tw=, v1-9 marks ,1-9 go'); return;
     }
     if ((m = c.match(/^set\s+(tw|textwidth)=(\d+)$/))) { tw = +m[2]; rule(); say('  textwidth=' + tw); return; }
     if (c === '') return;

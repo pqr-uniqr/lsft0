@@ -28,7 +28,11 @@
 // textbox); one pane for the STABLES, where its administrative works are
 // visualized. for now the stables are the directory: its files are the
 // personality's memory and identity, its subdirectories the personalities
-// it administers, and the same page waits at each of those paths. the
+// it administers, and the same page waits at each of those paths; beside
+// each file, its routes down the substrate: the layers at which a gene
+// file gives it an expression of its own (L3 conscious, L4 surface…),
+// read from the .node files. links for now, something more imaginative
+// later; VvilL's to keep once he is online. the
 // stables also hold the RESET: during the Genesis test, once the open
 // conversation has said its verdict (READY or NOT READY), a button appears
 // that asks the paddock to wipe it into the playwright's attempts.
@@ -197,7 +201,7 @@ const darkRules = (styles) => [
   ['.vvill-bar, .vvill-stables, .vvill-say', 'border-color: #fff;'],
   ['.vvill-say, .vvill-say textarea, .vvill-say button, .vvill-wipe, .vvill-conscious textarea, .vvill-conscious .ctl button',
     'background: #000; color: #fff; border-color: #fff;'],
-  ['.vvill-status, .convo h3, .turn.tool', 'color: #aaa;'],
+  ['.vvill-status, .convo h3, .turn.tool, .vvill-routes', 'color: #aaa;'],
   ['.convo h3', 'border-color: #444;'],
   ['.turn.user', 'background: #222;'],
   ['.vvill-conscious .hdr', 'color: #fff;'],
@@ -296,6 +300,7 @@ const frame = (content, { title = 'VvilL', styles = {}, wide = false, noZoom = f
   /* the double split pane */
   .vvill-split { display: grid; grid-template-columns: 1fr; gap: 0 32px; padding-bottom: 6em; }
   .vvill-stables { border-bottom: 1px solid #000; padding-bottom: 12px; margin-bottom: 12px; }
+  .vvill-routes { display: block; margin: 0 0 4px 1em; font-size: 0.8em; color: #666; }
   @media (min-width: 720px) {
     .vvill-split { grid-template-columns: 1fr 16em; }
     .vvill-stables { order: 2; border-bottom: 0; border-left: 1px solid #000; padding: 0 0 0 16px; margin: 0; }
@@ -338,13 +343,35 @@ ${turns.map(turnHtml).join('\n')}
 
 // 🗄️ a directory. a personality's (IDENTITY.md present) is the double split
 // pane; any other is a listing.
+// the routes down the substrate: for each file of the directory, the
+// layers at which a gene file gives it an expression of its own. the
+// .node at /_ (n+1 times)/dir governs /_ (n times)/dir/file; its 📄 lines
+// name a handler, a subgene in parentheses, and a pattern over file
+// names. the primary (L0) is the file's own link; L1 and L2 are
+// mycelium's own. links, for now
+const DEPTH = 8;
+async function routesOf(petri, cpath, files) {
+  const dir = cpath === '/' ? '' : cpath, out = {};
+  for (let k = 1; k <= DEPTH; k++) {
+    const node = '/_'.repeat(k + 1) + dir + '/.node';
+    if (!(await petri.zone.if(node))) continue;
+    const genes = (await petri.zone.rd8(node)).split('\n').map(l => l.match(/^📄(\S+?)(?:\(([^)]*)\))?\s+(.+)$/)).filter(Boolean);
+    for (const [, handler, , pattern] of genes) { let re; try { re = new RegExp(pattern.trim()); } catch (e) { continue; }
+      for (const f of files) { if (f.isDirectory || !re.test(f.name)) continue;
+        (out[f.name] = out[f.name] || []).push(`<a href="${'/_'.repeat(k) + dir + '/' + f.name}" title="${esc(handler)}">L${k} ${esc(handler.split('::').pop())}</a>`); } }
+  }
+  for (const n in out) out[n] = `<span class="vvill-routes">${out[n].join(' · ')}</span>`;
+  return out;
+}
+
 async function root(xface, petri) {
   const cpath = petri.pathology.cpath;
   const files = (xface.files || []).filter(f => !f.name.startsWith('.')).sort((a, b) => a.name.localeCompare(b.name));
+  const routes = await routesOf(petri, cpath, files);
   const nums = files.map(f => f.name.match(/^(\d+)\.jsonl$/)).filter(Boolean).map(m => parseInt(m[1], 10)).sort((a, b) => a - b);
   const numbered = (f) => /^\d+(\.jsonl)?$/.test(f.name); // the dream: listed apart
   const rows = files.filter(f => !numbered(f))
-    .map(f => `<div><a href="${join(cpath, f.name)}">${esc(f.isDirectory ? f.name + '/' : f.name)}</a></div>`);
+    .map(f => `<div><a href="${join(cpath, f.name)}">${esc(f.isDirectory ? f.name + '/' : f.name)}</a>${routes[f.name] || ''}</div>`);
   if (cpath.split('/').filter(Boolean).length > 1) rows.unshift(`<div><a href="${dirname(cpath)}">../</a></div>`);
   const listing = `<div class="vvill-ls">${rows.join('\n')}</div>`;
   const title = cpath.split('/').pop();
