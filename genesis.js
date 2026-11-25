@@ -28,8 +28,8 @@
 //       and the layer in view (genesis.bar.js), that layer boxed, and
 //       the flash readers (genesis.flash.js), reading the model
 //       (genesis.model.js) live from the buffer; with the L3's pane, 56
-//       columns and centered, its ruler, red, the caret's mark: a
-//       crosshair through it, two hairlines across the view. the bar tracks the
+//       columns and centered, its ruler, red, and in exonormal mode the
+//       caret's crosshair, two hairlines across the view. the bar tracks the
 //       caret when it is in view, else the page's center as the reader
 //       does; its taps switch the scheme; Tab and Shift+Tab step the
 //       layers from the cursor's, the layer's first line set in the
@@ -39,11 +39,18 @@
 //       cuts the selection and appends it there, a block of its own, and
 //       Backspace in normal mode shows it over the page, read fresh, in
 //       a plain textbox (Escape or Backspace closes it); the B side's
-//       own page has Backspace back to the file (writing first). marks:
-//       in visual mode a digit 1 to 9 marks the selection, a bar in its
-//       color down the right margin with the digit, kept per file by its
-//       text; ,1 to ,9 go to them; the digit again over the span clears
-//       it.
+//       own page has Backspace back to the file (writing first).
+//       the backtick leaves normal mode for EXONORMAL mode, where the file is
+//       a matrix of characters: the cursor, an arrow pointing its way,
+//       moves by w a s d at a set speed (Shift faster, Ctrl slower),
+//       coasts when the key is let go, and jumps on Space in its
+//       direction by its speed; the view keeps it in the middle; the
+//       crosshair is its. n is back to normal mode. marks live here:
+//       Shift and a digit 1 to 9 marks the coil under the cursor (the
+//       same again there clears it), a bar in its color down the right margin
+//       with the digit; the digit alone goes to the mark; Tab and
+//       Shift+Tab step the layers and the marks together. a mark names
+//       its coil by loop, layer and place, kept per file.
 //
 // mycelium already threads the underscores: a request at L3 reads its
 // genes from /_/_/_/_/.node and /_/_/_/_/vvill/.node (the substrate of the
@@ -199,7 +206,7 @@ const VIM_CSS = /* css */ `
   #conscious .hdr1, #conscious .hdr2, #conscious .hdr3, #conscious .cp { font-size: 1em; }
   #conscious .bslash { color: #000; background: rgba(255, 255, 255, 0.28); }
   ${Object.entries(INK).map(([c, v]) => `#conscious .${c} { color: ${v}; }`).join('\n  ')}
-  #vwrap { position: relative; isolation: isolate; }
+  #vwrap { position: relative; isolation: isolate; outline: none; }
   #vline, #ruler, #vsel div, #vhl div { position: absolute; pointer-events: none; z-index: -1; }
   #vline { left: -16px; right: -16px; background: ${C.band}; }
   #ruler { top: 0; bottom: 0; width: 0; border-left: 1px solid #ff0000; }
@@ -207,6 +214,7 @@ const VIM_CSS = /* css */ `
   #vhl div { background: ${C.match}; }
   #caret { position: absolute; pointer-events: none; background: ${C.caret}; mix-blend-mode: difference; }
   #caret.insert { mix-blend-mode: normal; }
+  #caret.exo { mix-blend-mode: normal; clip-path: polygon(0 10%, 100% 50%, 0 90%); }
   #vin { position: absolute; width: 1px; opacity: 0; border: 0; padding: 0; margin: 0; resize: none; outline: 0; font: inherit; overflow: hidden; }
   .vim-stat { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; gap: 1em; padding: 4px 16px;
     border-top: 1px solid ${C.rule}; background: ${C.bg}; color: ${C.stat}; font-family: ${FONT}; font-size: 13px; line-height: 20px; letter-spacing: 0.5px; white-space: pre; overflow: hidden; }
@@ -240,7 +248,7 @@ const GLUE_JS = /* js */ `(() => {
     probe: () => { const c = caret.getBoundingClientRect(), under = bar.getBoundingClientRect().bottom;
       return c.top >= under && c.bottom <= innerHeight - 36 ? (c.top + c.bottom) / 2 : innerHeight / 2; },
     go: (bs) => { const l = vim.line, b = bs.find(b => b.line > l) || bs[0];
-      if (vim.mode !== 'normal') vim.send('<Esc>'); vim.send(':' + (b.line + 1) + '<CR>zz'); },
+      if (vim.mode === 'exo') vim.send('n'); else if (vim.mode !== 'normal') vim.send('<Esc>'); vim.send(':' + (b.line + 1) + '<CR>zz'); },
     tap: () => g.scheme.next(), say: (m) => vim.say(m),
     step: (n) => { const doc = g.doc, ys = doc.loops.flatMap(l => l.layers), L = ys.length; if (!L) return null;
       const l = vim.line, p = doc.atLine(l);
@@ -277,7 +285,7 @@ const SURFACE_CSS = /* css */ `
   .vvill-crumb { font-family: serif; font-size: 1rem; }
   #conscious .blk { margin: 0; }
   #conscious .g { opacity: 1; font-weight: bold; }
-  #vwrap { position: relative; isolation: isolate; }
+  #vwrap { position: relative; isolation: isolate; outline: none; }
   #vline, #ruler, #vsel div, #vhl div { position: absolute; pointer-events: none; z-index: -1; }
   #vline { left: -16px; right: -16px; background: #f0f0f0; }
   #ruler { top: 0; bottom: 0; width: 0; border-left: 1px solid #ff0000; }
@@ -285,6 +293,7 @@ const SURFACE_CSS = /* css */ `
   #vhl div { border-bottom: 2px solid #ff0000; box-sizing: border-box; }
   #caret { position: absolute; pointer-events: none; background: #00ffff; mix-blend-mode: difference; }
   #caret.insert { background: #ff0000; mix-blend-mode: normal; }
+  #caret.exo { background: #ff0000; mix-blend-mode: normal; clip-path: polygon(0 10%, 100% 50%, 0 90%); }
   #xh, #xv { position: fixed; pointer-events: none; z-index: -1; background: rgba(255, 0, 0, 0.5); }
   #xh { left: 0; right: 0; height: 1px; } #xv { top: 0; bottom: 0; width: 1px; }
   #vmarks div { position: absolute; width: 0; border-left: 3px solid currentColor; pointer-events: none; }
@@ -301,11 +310,11 @@ const SURFACE_CSS = /* css */ `
   @media (prefers-color-scheme: dark) { ${surfaceDark(':root:not([data-theme="light"])')} }
   ${surfaceDark(':root[data-theme="dark"]')}
   ${schemed('ctrl', [['#vline', `background: ${C.band};`], ['#vsel div', `background: ${C.sel};`], ['#vhl div', `border-bottom: 0; background: ${C.match};`],
-    ['#caret, #caret.insert', `background: ${C.caret};`], ['#xh, #xv', `background: ${C.caret}; opacity: 0.5;`],
+    ['#caret, #caret.insert, #caret.exo', `background: ${C.caret};`], ['#xh, #xv', `background: ${C.caret}; opacity: 0.5;`],
     ['.vim-stat', `font-family: ${C.font}; font-size: ${C.size}; letter-spacing: ${C.track}; background: ${C.bg}; color: ${C.stat}; border-color: ${C.rule};`], ['.vim-stat #vpos', `color: ${C.pos};`],
     ['.vim-side', `background: ${C.bg}; color: ${C.ink};`], ['.vim-side textarea', `width: min(calc(56ch + 56 * ${C.em} + 34px), 100%); letter-spacing: ${C.em};`]])}
   ${schemed('navy', [['#vline', `background: ${NV.band};`], ['#vsel div', `background: ${NV.sel};`], ['#vhl div', `border-bottom-color: ${NV.match};`], ['#ruler', `border-left-color: ${NV.rule};`],
-    ['#caret, #caret.insert', `background: ${NV.caret};`], ['#xh, #xv', `background: ${NV.caret}; opacity: 0.3;`],
+    ['#caret, #caret.insert, #caret.exo', `background: ${NV.caret};`], ['#xh, #xv', `background: ${NV.caret}; opacity: 0.3;`],
     ['.vim-stat', `font-family: ${NV.font}; font-size: ${NV.size}; letter-spacing: ${NV.track}; background: ${NV.bg}; color: ${NV.ink}; border-color: ${NV.rule};`], ['.vim-stat #vpos', `color: ${NV.pos};`],
     ['.vim-side', `background: ${NV.bg}; color: ${NV.ink};`], ['.vim-side textarea', `width: min(calc(56ch + 56 * ${NV.em} + 34px), 100%); letter-spacing: ${NV.em};`]])}
 `;
@@ -429,7 +438,7 @@ const VIM_JS = String.raw`(() => {
     window.scrollTo(0, was + d * k); if (scrollY === was) { aim = null; frame = 0; return; } frame = requestAnimationFrame(step); };
   const settle = () => { if (frame) cancelAnimationFrame(frame); frame = 0; aim = null; };
   addEventListener('wheel', settle, { passive: true }); addEventListener('touchstart', settle, { passive: true });
-  addEventListener('scroll', () => { if (hl) hilite(); cross(); }, { passive: true });
+  addEventListener('scroll', () => { if (hl) hilite(); if (mode === 'exo') cross(); }, { passive: true });
 
   // the crosshair (the L4's): a hairline across the view through the
   // caret's middle and one down through it, moved with the caret, and
@@ -438,19 +447,36 @@ const VIM_JS = String.raw`(() => {
   const cross = () => { if (!xh) return; const c = caret.getBoundingClientRect(); xh.style.top = Math.round(c.top + c.height / 2) + 'px'; xv.style.left = Math.round(c.left + c.width / 2) + 'px'; };
   // the caret, drawn: a block in normal mode, a bar in insert
   function place() {
+    if (mode === 'exo') { placeExo(); return; }
     const r = rectOf(cur); if (!r) return;
     const w = wrap.getBoundingClientRect();
     const x = r.left - w.left, h = r.height || lh, y = r.top - w.top + (h - lh) / 2; // the line box, not the glyph's
-    caret.className = mode;
+    caret.className = mode; caret.style.transform = '';
     caret.style.left = x + 'px'; caret.style.top = y + 'px'; caret.style.height = lh + 'px';
     caret.style.width = (mode === 'insert' ? 2 : (r.width || cw)) + 'px';
     vline.style.top = y + 'px'; vline.style.height = lh + 'px';
     ta.style.left = x + 'px'; ta.style.top = y + 'px'; ta.style.height = lh + 'px';
-    cross();
+    if (xh) xh.hidden = xv.hidden = true;
     const top = r.top + scrollY, bot = top + h, vt = viewTop();
     if (top < vt + inset() + pad()) glide(top < inset() + 2 * pad() ? 0 : top - inset() - pad()); else if (bot > vt + viewH() - pad()) glide(bot - viewH() + pad());
     selection(); hilite(); drawMarks(); status();
     if (window.genesis && window.genesis.inView) window.genesis.inView(); // the bar follows the caret
+  }
+  // exonormal mode's placing: the caret on the cell, an arrow turned its
+  // way, the view scrolled to hold it in the middle, the crosshair on
+  function placeExo() {
+    const l = Math.max(0, Math.min(lastLine(), Math.round(exo.y))), c = Math.max(0, Math.round(exo.x)), le = lineEl[l]; if (!le) return;
+    const w = wrap.getBoundingClientRect(), b = le.getBoundingClientRect();
+    const x = x0() + c * cw, y = b.top - w.top + (b.height - lh) / 2;
+    cur = at(l, c);
+    caret.className = 'exo'; caret.style.transform = 'rotate(' + Math.round(exo.dir * 180 / Math.PI) + 'deg)';
+    caret.style.left = x + 'px'; caret.style.top = y + 'px'; caret.style.height = lh + 'px'; caret.style.width = cw + 'px';
+    vline.style.top = y + 'px'; vline.style.height = lh + 'px';
+    ta.style.left = x + 'px'; ta.style.top = y + 'px'; ta.style.height = lh + 'px';
+    settle(); window.scrollTo(0, Math.max(0, b.top + scrollY + b.height / 2 - (inset() + viewH()) / 2));
+    if (xh) { xh.hidden = xv.hidden = false; cross(); }
+    selection(); hilite(); drawMarks(); status();
+    if (window.genesis && window.genesis.inView) window.genesis.inView();
   }
   const selRange = () => {
     if (mode === 'visual') { const a = Math.min(anchor, cur), b = Math.max(anchor, cur); return { a, b: Math.min(N(), b + 1), lw: false }; }
@@ -500,45 +526,106 @@ const VIM_JS = String.raw`(() => {
     const p = path.split('/').pop();
     if (mode === 'cmd') left.textContent = cmd;
     else if (msg) left.textContent = msg;
-    else left.textContent = mode === 'insert' ? '-- INSERT --' : mode === 'visual' ? '-- VISUAL --' : mode === 'vline' ? '-- VISUAL LINE --' : '';
-    right.textContent = (modified() ? '[+] ' : '') + p + '  ' + (lineOf(cur) + 1) + ':' + (col(cur) + 1) + '  ' + keys.join('');
+    else left.textContent = mode === 'insert' ? '-- INSERT --' : mode === 'visual' ? '-- VISUAL --' : mode === 'vline' ? '-- VISUAL LINE --' : mode === 'exo' ? '-- EXONORMAL --' : '';
+    const l = mode === 'exo' ? Math.round(exo.y) : lineOf(cur), c = mode === 'exo' ? Math.round(exo.x) : col(cur);
+    right.textContent = (modified() ? '[+] ' : '') + p + '  ' + (l + 1) + ':' + (c + 1) + '  ' + keys.join('');
   }
   const say = (m) => { msg = m; status(); };
   const changed = () => { render(); place(); };
-  // marks (the surface's): in visual mode a digit 1 to 9 marks the selection;
-  // the same digit over a marked span clears the mark, elsewhere moves
-  // it. a mark stands in the right margin as a bar in its color down its
-  // lines, its digit beside; ,1 puts the cursor on mark 1, the view
-  // centered. kept per file in localStorage by their text, found again
-  // when the text moves (the mark's first line is enough); a mark whose
-  // text is gone waits unseen, for an undo
+  // marks, exonormal mode's: a mark names a coil by its loop, its layer
+  // (null in a loop's lead) and its place among the coils there, kept
+  // per file in localStorage; the page's model (the surface's, live)
+  // finds the coil again, so a mark follows its coil through edits and
+  // is gone, unseen, while the coil is. it stands in the right margin as
+  // a bar in its color down the coil's lines, its digit beside
   const markbox = document.getElementById('vmarks'), MKEY = 'vim.marks:' + path;
   const MCOLORS = [null, '#ff0000', '#ff8000', '#ffd700', '#00c000', '#00bfff', '#3366ff', '#9933ff', '#ff00ff', '#808080'];
-  let marks = {}; try { marks = JSON.parse(localStorage.getItem(MKEY) || '{}') || {}; } catch (e) { marks = {}; }
+  let marks = {}; try { const m = JSON.parse(localStorage.getItem(MKEY) || '{}') || {}; for (const n in m) if (m[n] && m[n].loop !== undefined && m[n].k !== undefined) marks[n] = m[n]; } catch (e) { marks = {}; }
   const keepMarks = () => { try { localStorage.setItem(MKEY, JSON.stringify(marks)); } catch (e) {} };
-  const nearest = (s, near) => { let best = -1, i = text.indexOf(s); while (i >= 0) { if (best < 0 || Math.abs(i - near) < Math.abs(best - near)) best = i; i = text.indexOf(s, i + 1); } return best; };
-  const anchorMarks = () => { let moved = false; for (const n in marks) { const m = marks[n]; if (text.startsWith(m.text, m.a)) { m.lost = false; continue; }
-    let i = nearest(m.text, m.a); if (i < 0) { const head = m.text.split('\n')[0]; i = head.length >= 4 ? nearest(head, m.a) : -1; }
-    if (i < 0) m.lost = true; else { m.a = i; m.b = Math.min(N(), i + m.text.length); m.lost = false; moved = true; } }
-    if (moved) keepMarks(); };
+  const docOf = () => (window.genesis && window.genesis.doc) || null;
+  const coilsOf = (doc, loopN, layerN) => { const l = doc.loop(loopN); if (!l) return null; const bs = layerN === null ? l.lead : (doc.layer(loopN, layerN) || {}).blocks; return bs ? bs.flatMap(b => b.sentences) : null; };
+  const coilAt = (o) => { const doc = docOf(), p = doc && doc.at(o); if (!p || !p.sentence || p.loop === null || p.loop === undefined || p.block.role === 'loop' || p.block.role === 'header') return null;
+    const layer = p.layer === undefined ? null : p.layer, cs = coilsOf(doc, p.loop, layer), k = cs ? cs.indexOf(p.sentence) : -1; return k < 0 ? null : { loop: p.loop, layer, k, s: p.sentence }; };
+  const coilOf = (m) => { const doc = docOf(); if (!doc) return null; const cs = coilsOf(doc, m.loop, m.layer); return (cs && cs[m.k]) || null; };
+  const sameCoil = (m, c) => !!(m && c && m.loop === c.loop && m.layer === c.layer && m.k === c.k);
   function drawMarks() {
-    if (!markbox) return; markbox.innerHTML = ''; anchorMarks();
+    if (!markbox) return; markbox.innerHTML = '';
     const w = wrap.getBoundingClientRect(), x = w.width + 6;
-    for (const n in marks) { const m = marks[n]; if (m.lost) continue;
-      const la = lineOf(m.a), lb = lineOf(Math.max(m.a, m.b - 1)), ra = lineEl[la] && lineEl[la].getBoundingClientRect(), rb = lineEl[lb] && lineEl[lb].getBoundingClientRect(); if (!ra || !rb) continue;
+    for (const n in marks) { const sn = coilOf(marks[n]); if (!sn || sn.end <= sn.start) continue;
+      const la = lineOf(sn.start), lb = lineOf(Math.max(sn.start, sn.end - 1)), ra = lineEl[la] && lineEl[la].getBoundingClientRect(), rb = lineEl[lb] && lineEl[lb].getBoundingClientRect(); if (!ra || !rb) continue;
       const d = document.createElement('div'); d.style.cssText = 'left:' + x + 'px;top:' + (ra.top - w.top) + 'px;height:' + Math.max(lh, rb.bottom - ra.top) + 'px;color:' + MCOLORS[n];
-      const s = document.createElement('span'); s.textContent = n; d.appendChild(s); markbox.appendChild(d); }
+      const t = document.createElement('span'); t.textContent = n; d.appendChild(t); markbox.appendChild(d); }
   }
   const setMark = (n) => {
-    const sp = selRange(), a = sp.lw ? starts[sp.la] : sp.a, b = sp.lw ? lineEnd(sp.lb) : sp.b, m = marks[n];
-    mode = 'normal'; cur = clampNormal(cur);
-    if (m && !m.lost && m.a < b && a < m.b) { delete marks[n]; say('mark ' + n + ' cleared'); }
-    else { marks[n] = { a, b, text: text.slice(a, b) }; say('mark ' + n + (m ? ' moved' : ' set')); }
-    keepMarks(); changed();
+    const c = coilAt(cur); if (!c) { say(docOf() ? 'no coil under the cursor' : 'no coils on this page'); return; }
+    const m = marks[n];
+    if (sameCoil(m, c)) { delete marks[n]; say('mark ' + n + ' cleared'); }
+    else { marks[n] = { loop: c.loop, layer: c.layer, k: c.k }; say('mark ' + n + (m ? ' moved' : ' set')); }
+    keepMarks(); drawMarks();
   };
-  const jumpMark = (n) => { const m = marks[n]; if (!m) { say('no mark ' + n); return; } anchorMarks();
-    if (m.lost) { say('mark ' + n + ' is gone from the text'); return; }
-    cur = clampNormal(m.a); want = col(cur); zmid(); place(); say('mark ' + n); };
+  const markStops = () => Object.keys(marks).map(n => { const sn = coilOf(marks[n]); return sn ? { n: +n, o: sn.start } : null; }).filter(Boolean);
+  const jumpMark = (n) => { const m = marks[n]; if (!m) { say('no mark ' + n); return; } const sn = coilOf(m); if (!sn) { say('mark ' + n + ' is gone with its coil'); return; } exoTo(sn.start); say('mark ' + n); };
+
+  // exonormal mode: the file as a matrix of characters, the cursor a
+  // point in it free of the lines, moved by w a s d (the arrows too) at
+  // a set speed in cells, Shift three times that, Ctrl a third, coasting
+  // to a stop when the key is let go; Space jumps it its way by its
+  // speed; the caret an arrow pointing where it travels; the view holds
+  // it in the middle while the page allows; the crosshair shows. n is
+  // back to normal mode, on the nearest character. Shift and a digit
+  // marks the coil under the cursor (one hand's reach), the digit alone
+  // goes to the mark, Tab and
+  // Shift+Tab step the layers' first lines and the marks together. keys
+  // are held and let go here, so the mode reads the keyboard itself,
+  // below the parser, and holds it on the page's wrap, not the textbox:
+  // a key held in a textbox brings up the Mac's accent menu
+  const SPEED = 12, FAST = 36, SLOW = 4, DRAG = 6, CATCH = 12; // cells a second; the decay and the catch-up, a second's rates
+  let exo = null, exoFrame = 0;
+  const x0 = () => (lineEl[0] || root).getBoundingClientRect().left - wrap.getBoundingClientRect().left;
+  wrap.tabIndex = -1;
+  const enterExo = () => { mode = 'exo'; exo = { x: col(cur), y: lineOf(cur), vx: 0, vy: 0, dir: 0, held: new Set(), fast: false, slow: false, t: 0 }; place(); wrap.focus({ preventScroll: true }); };
+  const leaveExo = () => { if (exoFrame) cancelAnimationFrame(exoFrame); exoFrame = 0; cur = clampNormal(at(Math.round(exo.y), Math.round(exo.x))); want = col(cur); exo = null; mode = 'normal'; place(); ta.focus({ preventScroll: true }); };
+  const exoTo = (o) => { exo.x = col(o); exo.y = lineOf(o); exo.vx = exo.vy = 0; place(); };
+  const exoClamp = () => { if (exo.x < 0) { exo.x = 0; exo.vx = 0; } if (exo.x > tw) { exo.x = tw; exo.vx = 0; } if (exo.y < 0) { exo.y = 0; exo.vy = 0; } if (exo.y > lastLine()) { exo.y = lastLine(); exo.vy = 0; } };
+  const exoTick = (dt) => {
+    const h = exo.held, tx = (h.has('d') ? 1 : 0) - (h.has('a') ? 1 : 0), ty = (h.has('s') ? 1 : 0) - (h.has('w') ? 1 : 0);
+    if (tx || ty) { const sp = (exo.fast ? FAST : exo.slow ? SLOW : SPEED) / Math.hypot(tx, ty), k = 1 - Math.exp(-CATCH * dt); exo.vx += (tx * sp - exo.vx) * k; exo.vy += (ty * sp * cw / lh - exo.vy) * k; }
+    else { const k = Math.exp(-DRAG * dt); exo.vx *= k; exo.vy *= k; if (Math.hypot(exo.vx * cw, exo.vy * lh) < 0.5 * cw) exo.vx = exo.vy = 0; }
+    if (exo.vx || exo.vy) exo.dir = Math.atan2(exo.vy * lh, exo.vx * cw);
+    exo.x += exo.vx * dt; exo.y += exo.vy * dt; exoClamp();
+    if (exo.vx || exo.vy || tx || ty) place();
+  };
+  const exoMoving = () => !!exo && !!(exo.held.size || exo.vx || exo.vy);
+  const exoLoop = (t) => { if (mode !== 'exo') { exoFrame = 0; return; } const dt = Math.min(0.05, Math.max(0, (t - exo.t) / 1000)); exo.t = t; exoTick(dt); exoFrame = exoMoving() ? requestAnimationFrame(exoLoop) : 0; };
+  const exoRun = () => { if (!exoFrame) { exo.t = performance.now(); exoFrame = requestAnimationFrame(exoLoop); } };
+  const EXO_KEYS = { w: 'w', a: 'a', s: 's', d: 'd', ArrowUp: 'w', ArrowLeft: 'a', ArrowDown: 's', ArrowRight: 'd' }, NUDGE = { w: [0, -1], a: [-1, 0], s: [0, 1], d: [1, 0] };
+  const exoStops = () => { const doc = docOf(), ss = []; if (doc) for (const y of doc.loops.flatMap(l => l.layers)) ss.push({ o: firstNb(y.line) }); for (const m of markStops()) ss.push(m);
+    return ss.map(p => ({ ...p, l: lineOf(p.o), c: col(p.o) })).sort((p, q) => p.o - q.o); };
+  const exoStep = (d) => { const ss = exoStops(); if (!ss.length) return; const y = Math.round(exo.y), x = Math.round(exo.x);
+    let i = d > 0 ? ss.findIndex(p => p.l > y || (p.l === y && p.c > x)) : ss.length - 1 - [...ss].reverse().findIndex(p => p.l < y || (p.l === y && p.c < x));
+    if (i < 0) i = 0; if (i >= ss.length) i = ss.length - 1;
+    const p = ss[i]; exoTo(p.o); if (p.n) say('mark ' + p.n); };
+  const exoKey = (e) => {
+    if (e.metaKey) return;
+    exo.fast = e.shiftKey; exo.slow = e.ctrlKey;
+    const k = e.key, d = EXO_KEYS[k.length === 1 ? k.toLowerCase() : k];
+    if (!/^(Shift|Control|Alt|Meta)$/.test(k)) msg = ''; // a key clears the status line's word, as the parser's do
+    if (d) { e.preventDefault(); if (e.repeat) return;
+      if (!exo.held.has(d)) { exo.held.add(d); const n = NUDGE[d]; exo.x = Math.round(exo.x) + n[0]; exo.y = Math.round(exo.y) + n[1]; exoClamp(); exo.dir = Math.atan2(n[1] * lh, n[0] * cw); place(); }
+      exoRun(); return; }
+    if (k === ' ') { e.preventDefault(); if (e.repeat) return; const sp = Math.hypot(exo.vx * cw, exo.vy * lh) / cw, n = Math.max(3, Math.round(sp * 0.5));
+      exo.x = Math.round(exo.x + Math.cos(exo.dir) * n); exo.y = Math.round(exo.y + Math.sin(exo.dir) * n * cw / lh); exoClamp(); place(); return; }
+    if (k === 'n' || k === 'N') { e.preventDefault(); leaveExo(); return; }
+    if (k === 'Tab') { e.preventDefault(); exoStep(e.shiftKey ? -1 : 1); return; }
+    if (e.shiftKey && /^Digit[1-9]$/.test(e.code)) { e.preventDefault(); setMark(+e.code[5]); return; } // the key's place, not its symbol
+    if (/^[1-9]$/.test(k)) { e.preventDefault(); jumpMark(+k); return; }
+    if (k === 'Escape') { e.preventDefault(); return; }
+    if (k === '-' || k === '=') { e.preventDefault(); zoomBy(k === '=' ? 0.05 : -0.05); return; }
+    if (k === 'Shift' || k === 'Control') { status(); return; }
+    if (k.length === 1) e.preventDefault();
+  };
+  const exoUp = (e) => { if (!exo) return; exo.fast = e.shiftKey; exo.slow = e.ctrlKey; const k = e.key, d = EXO_KEYS[k.length === 1 ? k.toLowerCase() : k]; if (d) exo.held.delete(d); };
+  const exoDrop = () => { if (exo) exo.held.clear(); };
 
   // ---- motions: each takes the count and the cursor, says where to go and
   // how the span is cut for an operator (linewise, inclusive, exclusive)
@@ -742,7 +829,6 @@ const VIM_JS = String.raw`(() => {
   }
   function run(t) {
     const vis = mode === 'visual' || mode === 'vline';
-    if (vis && markbox && t.length === 1 && /^[1-9]$/.test(t[0])) { setMark(+t[0]); return true; }
     let { n: c1, i } = count(t, 0);
     if (i >= t.length) return 'wait';
     let op = null;
@@ -821,14 +907,12 @@ const VIM_JS = String.raw`(() => {
       case '<C-e>': case '<C-y>': { glide(viewTop() + (k === '<C-e>' ? n : -n) * lh); let l = lineOf(cur);
         while (l < lastLine() && lineY(l).top < viewTop() + inset() + pad()) l++; while (l > 0 && lineY(l).bot > viewTop() + viewH() - pad()) l--;
         if (l !== lineOf(cur)) cur = clampNormal(at(l, want)); place(); return true; }
-      // ,w writes (Pete's shortcut), ,1 to ,9 go to the marks (the surface's). a
-      // lone , waits a second for the key, then
+      // ,w writes (Pete's shortcut). a lone , waits a second for the w, then
       // is the motion (the reverse of ;); any other key after it is the
       // motion and then that key, as if typed apart
       case ',': { if (vis) break;
         if (t[i + 1] === undefined) { const snap = t.join(' '); clearTimeout(commaTimer);
           commaTimer = setTimeout(() => { if (keys.join(' ') !== snap) return; keys = []; const m = motion(t, i, { n: c1, op: false }); if (m && m !== 'wait') move(m); status(); }, 1000); return 'wait'; }
-        if (markbox && /^[1-9]$/.test(t[i + 1])) { jumpMark(+t[i + 1]); return true; }
         if (t[i + 1] === 'w') { ex('w'); return true; }
         const m = motion(t, i, { n: c1, op: false }); if (m && m !== 'wait') move(m); return run(keys = t.slice(i + 1)); }
       case 'Z': { if (t[i + 1] === undefined) return 'wait'; if (t[i + 1] === 'Z') ex('x'); else if (t[i + 1] === 'Q') ex('q!'); return true; }
@@ -839,6 +923,7 @@ const VIM_JS = String.raw`(() => {
       // editor sets the cursor on it, the line in the middle of the view
       case '<Tab>': case '<S-Tab>': { const g = window.genesis, ln = g && g.step ? g.step(k === '<Tab>' ? n : -n) : null; if (ln === null || ln === undefined) return null;
         cur = clampNormal(firstNb(ln)); want = col(cur); zmid(); place(); return true; }
+      case '\x60': enterExo(); return true; // the backtick
       case '<Esc>': case '<C-[>': case '<C-c>': return true;
     }
     const m = motion(t, i, { n: c1, op: false }); if (m === 'wait') return 'wait'; if (!m) return null;
@@ -979,7 +1064,7 @@ const VIM_JS = String.raw`(() => {
       case 'e!': window.onbeforeunload = null; location.reload(); return;
       case 'noh': case 'nohlsearch': hl = null; hilite(); return;
       case 'set tw?': case 'set textwidth?': say('  textwidth=' + tw); return;
-      case 'help': say('genesis.js: motions, operators d c y gq, objects, v V, u ^R ., / n *, :w ,w :q :s :N :noh :set tw=, v1-9 marks ,1-9 go'); return;
+      case 'help': say('genesis.js: motions, operators d c y gq, objects, v V, u ^R ., / n *, :w ,w :q :s :N :noh :set tw=, \x60 exonormal: wasd Space n Tab Shift+1-9 marks 1-9'); return;
     }
     if ((m = c.match(/^set\s+(tw|textwidth)=(\d+)$/))) { tw = +m[2]; rule(); say('  textwidth=' + tw); return; }
     if (c === '') return;
@@ -996,6 +1081,7 @@ const VIM_JS = String.raw`(() => {
   ta.addEventListener('keydown', (e) => {
     if (e.isComposing || e.keyCode === 229 || busy()) return;
     if (sideOpen()) { if (e.key === 'Escape' || e.key === 'Backspace') hideSide(); e.preventDefault(); return; }
+    if (mode === 'exo') { exoKey(e); return; }
     const k = nameOf(e); if (!k) return;
     if (k === '<D-s>') { e.preventDefault(); ex('w'); return; }
     if (k === '<D-CR>') { if (bside && (mode === 'visual' || mode === 'vline')) { e.preventDefault(); feed(k); } return; }
@@ -1010,12 +1096,14 @@ const VIM_JS = String.raw`(() => {
     if (k.startsWith('<C-') && !CTRL.has(k)) return;
     e.preventDefault(); feed(k);
   });
+  ta.addEventListener('keyup', exoUp); addEventListener('blur', exoDrop);
+  wrap.addEventListener('keydown', (e) => { if (mode === 'exo' && !busy() && !sideOpen()) exoKey(e); }); wrap.addEventListener('keyup', exoUp); wrap.addEventListener('blur', exoDrop);
   // an extension can eat Escape and blur the box instead (vimium does): a blur
   // that leaves nothing focused while the page keeps focus is read as that Escape
   let pressed = 0; document.addEventListener('pointerdown', () => { pressed = Date.now(); }, true);
   ta.addEventListener('blur', () => setTimeout(() => {
     if (!document.hasFocus() || document.activeElement !== document.body || Date.now() - pressed < 500) return;
-    if (mode === 'insert') leave(); else if (mode === 'cmd') cmdKey('<Esc>'); else feed('<Esc>'); ta.focus({ preventScroll: true }); }, 0));
+    if (mode === 'insert') leave(); else if (mode === 'cmd') cmdKey('<Esc>'); else if (mode === 'exo') exoDrop(); else feed('<C-c>'); ta.focus({ preventScroll: true }); }, 0));
   // what the textbox catches on its own: composed text, dead keys, a paste
   const drain = () => { const v = ta.value; if (!v) return; ta.value = ''; if (busy()) return;
     if (mode === 'insert') typed(v); else if (mode === 'normal') { reg = { text: v.endsWith('\n') ? v.slice(0, -1) : v, line: v.endsWith('\n') }; put(false, 1); } };
@@ -1030,10 +1118,10 @@ const VIM_JS = String.raw`(() => {
     if (l >= 0) { let c = 0; const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, { acceptNode: (n) => n.parentElement.closest('.g') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
       let n; while ((n = w.nextNode())) { if (n === node) { c += off; break; } c += n.data.length; }
       if (node.nodeType === 1) c = line(l).length;
-      cur = mode === 'insert' ? at(l, c) : clampNormal(at(l, c)); want = col(cur); place(); }
-    ta.focus({ preventScroll: true });
+      if (mode === 'exo') { exo.x = c; exo.y = l; exo.vx = exo.vy = 0; } else { cur = mode === 'insert' ? at(l, c) : clampNormal(at(l, c)); want = col(cur); } place(); }
+    (mode === 'exo' ? wrap : ta).focus({ preventScroll: true });
   });
-  document.addEventListener('click', (e) => { if (!e.target.closest('a, input, textarea, button')) ta.focus({ preventScroll: true }); });
+  document.addEventListener('click', (e) => { if (!e.target.closest('a, input, textarea, button')) (mode === 'exo' ? wrap : ta).focus({ preventScroll: true }); });
   window.addEventListener('resize', () => { measure(); place(); });
   window.onbeforeunload = (e) => { if (modified()) { e.preventDefault(); e.returnValue = ''; } };
 
@@ -1042,7 +1130,7 @@ const VIM_JS = String.raw`(() => {
   if (document.fonts) { const fit = () => { measure(); place(); }; document.fonts.ready.then(fit); document.fonts.addEventListener('loadingdone', fit); }
   // a handle for scripts: send('dwihello<Esc>') types as vim reads it
   const KEYS = { '<Esc>': 'Escape', '<CR>': 'Enter', '<BS>': 'Backspace', '<Tab>': 'Tab', '<Del>': 'Delete', '<Left>': 'ArrowLeft', '<Right>': 'ArrowRight', '<Up>': 'ArrowUp', '<Down>': 'ArrowDown', '<PageDown>': 'PageDown', '<PageUp>': 'PageUp' };
-  window.vim = { get text() { return text; }, get cur() { return cur; }, get line() { return lineOf(cur); }, get mode() { return mode; }, get reg() { return reg; }, get msg() { return msg; }, get zoom() { return zoom; }, say,
+  window.vim = { get text() { return text; }, get cur() { return cur; }, get line() { return lineOf(cur); }, get mode() { return mode; }, get reg() { return reg; }, get msg() { return msg; }, get zoom() { return zoom; }, get exo() { return exo && { x: exo.x, y: exo.y, vx: exo.vx, vy: exo.vy, dir: exo.dir, held: [...exo.held] }; }, tick: (dt) => { if (exo) exoTick(dt); }, say,
     send: (s) => { const toks = s.match(/<[^>]+>|[^]/g) || []; for (const t of toks) { let m;
       if ((m = t.match(/^<C-(.)>$/))) ta.dispatchEvent(new KeyboardEvent('keydown', { key: m[1], ctrlKey: true, cancelable: true }));
       else if ((m = t.match(/^<S-(.+)>$/))) ta.dispatchEvent(new KeyboardEvent('keydown', { key: KEYS['<' + m[1] + '>'] || m[1], shiftKey: true, cancelable: true }));
