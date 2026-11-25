@@ -26,13 +26,16 @@
 // single continuous conversation with the personality (its past
 // conversations, deposited by number, then the open one, then the one
 // textbox); one pane for the STABLES, where its administrative works are
-// visualized. for now the stables are the directory: its files are the
-// personality's memory and identity, its subdirectories the personalities
-// it administers, and the same page waits at each of those paths; beside
-// each file, its routes down the substrate: the layers at which a gene
-// file gives it an expression of its own (L3 conscious, L4 surface…),
-// read from the .node files. links for now, something more imaginative
-// later; VvilL's to keep once he is online. the
+// visualized: an icon matrix, after Pete's hyphae prototype, the design
+// idea used here once and not a system of the substrate (other
+// individuals may copy it or not). each icon opens a frame within the
+// stables. the garden is planted by hand for now (GARDEN): the cabinet,
+// the directory listing, its files the personality's memory and
+// identity, its subdirectories the personalities it administers, the
+// same page waiting at each; the substrate, each file's routes down the
+// layers, read from the gene files; the dream, the deposited
+// conversations. VvilL's to arrange for the user once he is online, icons
+// for the harness's functions as he sees them. the
 // stables also hold the RESET: during the Genesis test, once the open
 // conversation has said its verdict (READY or NOT READY), a button appears
 // that asks the paddock to wipe it into the playwright's attempts.
@@ -201,7 +204,8 @@ const darkRules = (styles) => [
   ['.vvill-bar, .vvill-stables, .vvill-say', 'border-color: #fff;'],
   ['.vvill-say, .vvill-say textarea, .vvill-say button, .vvill-wipe, .vvill-conscious textarea, .vvill-conscious .ctl button',
     'background: #000; color: #fff; border-color: #fff;'],
-  ['.vvill-status, .convo h3, .turn.tool, .vvill-routes', 'color: #aaa;'],
+  ['.vvill-status, .convo h3, .turn.tool, .vvill-routes, .vvill-icon .name', 'color: #aaa;'],
+  ['.vvill-icon[aria-pressed="true"]', 'border-color: #fff;'], ['.vvill-frame', 'border-color: #555;'],
   ['.convo h3', 'border-color: #444;'],
   ['.turn.user', 'background: #222;'],
   ['.vvill-conscious .hdr', 'color: #fff;'],
@@ -301,6 +305,13 @@ const frame = (content, { title = 'VvilL', styles = {}, wide = false, noZoom = f
   .vvill-split { display: grid; grid-template-columns: 1fr; gap: 0 32px; padding-bottom: 6em; }
   .vvill-stables { border-bottom: 1px solid #000; padding-bottom: 12px; margin-bottom: 12px; }
   .vvill-routes { display: block; margin: 0 0 4px 1em; font-size: 0.8em; color: #666; }
+  .vvill-matrix { display: grid; grid-template-columns: repeat(auto-fill, minmax(4.5em, 1fr)); gap: 6px; margin: 8px 0; }
+  .vvill-icon { font: inherit; color: inherit; background: none; border: 1px solid transparent; padding: 8px 2px 6px; text-align: center; cursor: pointer; }
+  .vvill-icon .glyph { display: block; font-size: 1.8em; line-height: 1.2; }
+  .vvill-icon .name { display: block; font-size: 0.75em; color: #666; margin-top: 2px; }
+  .vvill-icon[aria-pressed="true"] { border-color: #000; }
+  .vvill-frame { border: 1px solid #ccc; padding: 8px 10px; margin: 2px 0 12px; }
+  .vvill-frame[hidden] { display: none; }
   @media (min-width: 720px) {
     .vvill-split { grid-template-columns: 1fr 16em; }
     .vvill-stables { order: 2; border-bottom: 0; border-left: 1px solid #000; padding: 0 0 0 16px; margin: 0; }
@@ -343,6 +354,27 @@ ${turns.map(turnHtml).join('\n')}
 
 // 🗄️ a directory. a personality's (IDENTITY.md present) is the double split
 // pane; any other is a listing.
+// the garden: the stables' icons, in their order. an icon opens the frame
+// of its id, when the page has made one
+const GARDEN = [
+  { id: 'cabinet', glyph: '🗄️', name: 'files' },
+  { id: 'routes', glyph: '🧬', name: 'substrate' },
+  { id: 'dream', glyph: '💭', name: 'dream' },
+];
+const matrix = (frames) => {
+  const icons = GARDEN.filter(g => frames[g.id]);
+  return `<div class="vvill-matrix">${icons.map(g => `<button type="button" class="vvill-icon" data-frame="${g.id}" aria-pressed="false"><span class="glyph">${g.glyph}</span><span class="name">${esc(g.name)}</span></button>`).join('')}</div>
+${icons.map(g => `<div class="vvill-frame" id="frame-${g.id}" hidden>${frames[g.id]}</div>`).join('\n')}`;
+};
+// one frame open at a time, the choice kept per path; the cabinet at first
+const STABLES_JS = (cpath) => /* js */ `(() => {
+  const key = 'vvill-stables:' + ${JSON.stringify(cpath)}, icons = [...document.querySelectorAll('.vvill-icon')];
+  const open = (id) => { for (const b of icons) { const on = b.dataset.frame === id; b.setAttribute('aria-pressed', on); const f = document.getElementById('frame-' + b.dataset.frame); if (f) f.hidden = !on; } try { localStorage.setItem(key, id); } catch (e) {} };
+  let was = 'cabinet'; try { const s = localStorage.getItem(key); if (s !== null) was = s; } catch (e) {}
+  for (const b of icons) b.addEventListener('click', () => open(b.getAttribute('aria-pressed') === 'true' ? '' : b.dataset.frame));
+  open(was === '' || icons.some(b => b.dataset.frame === was) ? was : 'cabinet');
+})();`;
+
 // the routes down the substrate: for each file of the directory, the
 // layers at which a gene file gives it an expression of its own. the
 // .node at /_ (n+1 times)/dir governs /_ (n times)/dir/file; its 📄 lines
@@ -358,10 +390,11 @@ async function routesOf(petri, cpath, files) {
     const genes = (await petri.zone.rd8(node)).split('\n').map(l => l.match(/^📄(\S+?)(?:\(([^)]*)\))?\s+(.+)$/)).filter(Boolean);
     for (const [, handler, , pattern] of genes) { let re; try { re = new RegExp(pattern.trim()); } catch (e) { continue; }
       for (const f of files) { if (f.isDirectory || !re.test(f.name)) continue;
-        (out[f.name] = out[f.name] || []).push(`<a href="${'/_'.repeat(k) + dir + '/' + f.name}" title="${esc(handler)}">L${k} ${esc(handler.split('::').pop())}</a>`); } }
+        (out[f.name] = out[f.name] || []).push(`<a href="${'/_'.repeat(k) + dir + '/' + f.name}" title="${esc(handler)}">L${k} "${esc(handler.split('::').pop())}"</a>`); } }
   }
-  for (const n in out) out[n] = `<span class="vvill-routes">${out[n].join(' · ')}</span>`;
-  return out;
+  const rows = [];
+  for (const n in out) rows.push(`<div><a href="${join(cpath, n)}">${esc(n)}</a><span class="vvill-routes">${out[n].join(' · ')}</span></div>`);
+  return rows.length ? `<div class="vvill-ls">${rows.join('\n')}</div>` : '';
 }
 
 async function root(xface, petri) {
@@ -371,7 +404,7 @@ async function root(xface, petri) {
   const nums = files.map(f => f.name.match(/^(\d+)\.jsonl$/)).filter(Boolean).map(m => parseInt(m[1], 10)).sort((a, b) => a - b);
   const numbered = (f) => /^\d+(\.jsonl)?$/.test(f.name); // the dream: listed apart
   const rows = files.filter(f => !numbered(f))
-    .map(f => `<div><a href="${join(cpath, f.name)}">${esc(f.isDirectory ? f.name + '/' : f.name)}</a>${routes[f.name] || ''}</div>`);
+    .map(f => `<div><a href="${join(cpath, f.name)}">${esc(f.isDirectory ? f.name + '/' : f.name)}</a></div>`);
   if (cpath.split('/').filter(Boolean).length > 1) rows.unshift(`<div><a href="${dirname(cpath)}">../</a></div>`);
   const listing = `<div class="vvill-ls">${rows.join('\n')}</div>`;
   const title = cpath.split('/').pop();
@@ -383,8 +416,8 @@ async function root(xface, petri) {
   return frame(`<div class="vvill-split">
 <aside class="vvill-stables">
 ${crumb(cpath)}
-${listing}
-${dream}
+${matrix({ cabinet: listing, routes, dream })}
+<script>${STABLES_JS(cpath)}</script>
 <p id="state" class="vvill-status"></p>
 <button type="button" id="wipe" class="vvill-wipe" hidden></button>
 </aside>

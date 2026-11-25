@@ -18,7 +18,6 @@
 //       leading and tracking, served from /_fonts. one scheme in either
 //       device mode.
 //   L4  http://vostok.local:8880/_/_/_/_/vvill/GENESIS.txt  surface()
-//   L5  http://vostok.local:8880/_/_/_/_/_/vvill/GENESIS.txt  the same
 //       the surface expression (genesis.reader.js, the primary) as a vim
 //       editor, the two merged: its white page and black and red
 //       sentences, the gutter numbers bold and full, the loop headers in
@@ -44,7 +43,7 @@
 //       in visual mode a digit 1 to 9 marks the selection, a bar in its
 //       color down the right margin with the digit, kept per file by its
 //       text; ,1 to ,9 go to them; the digit again over the span clears
-//       it. the L5 serves the same page, where Pete works now.
+//       it.
 //
 // mycelium already threads the underscores: a request at L3 reads its
 // genes from /_/_/_/_/.node and /_/_/_/_/vvill/.node (the substrate of the
