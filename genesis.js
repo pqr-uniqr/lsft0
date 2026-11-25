@@ -35,9 +35,11 @@
 //       layers from the cursor's, the layer's first line set in the
 //       middle of the view; the player, open, has the keys; a
 //       re-render stops a flash. the file has a B side,
-//       rejects.GENESIS.txt, edited by the same page: ⌘↩ in visual mode
+//       rejects.GENESIS.txt, kept by the same page: ⌘↩ in visual mode
 //       cuts the selection and appends it there, a block of its own, and
-//       Backspace in normal mode switches sides (writing first).
+//       Backspace in normal mode shows it over the page, read fresh, in
+//       a plain textbox (Escape or Backspace closes it); the B side's
+//       own page has Backspace back to the file (writing first).
 //
 // mycelium already threads the underscores: a request at L3 reads its
 // genes from /_/_/_/_/.node and /_/_/_/_/vvill/.node (the substrate of the
@@ -122,9 +124,10 @@ const page = (xface, subgenes, petri, dress) => {
   const local = petri.pathology.spore.isLocal();
   const esc = K.esc;
   const html = dress.loops ? loops(K.blocksHtml(f)) : K.blocksHtml(f);
-  const body = `<div id="vwrap"><div class="vvill-conscious vim" id="conscious" data-path="${esc(ipath)}"${dress.bside ? ' data-bside="' + esc(other(ipath)) + '"' : ''} data-save="${esc(cpath.replace(/\/[^/]*$/, '') + '/.save')}" data-tw="${TW}">${html}</div>`
+  const body = `<div id="vwrap"><div class="vvill-conscious vim" id="conscious" data-path="${esc(ipath)}"${dress.bside ? ' data-bside="' + esc(other(ipath)) + '" data-side="' + (ipath === FILE ? 'a' : 'b') + '"' : ''} data-save="${esc(cpath.replace(/\/[^/]*$/, '') + '/.save')}" data-tw="${TW}">${html}</div>`
     + `<div id="vline"></div><div id="ruler"></div><div id="vhl"></div><div id="caret" class="normal"></div><div id="vsel"></div>${dress.marks ? '<div id="xh"></div><div id="xv"></div>' : ''}<textarea id="vin" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"></textarea></div>`
-    + `<div class="vim-stat"><span id="vmode"></span><span id="vpos"></span></div>`;
+    + `<div class="vim-stat"><span id="vmode"></span><span id="vpos"></span></div>`
+    + (dress.bside ? `<div id="vside" class="vim-side" hidden><div class="where"></div><textarea readonly spellcheck="false"></textarea></div>` : '');
   const script = local ? `<script type="application/json" id="text">${JSON.stringify(raw).replace(/</g, '\\u003c')}</script>`
     + `<script>const K = (${V.KERNEL})({ links: false });\n${dress.loops ? LOOPS_JS : ''}${VIM_JS}</script>`
     + (dress.bar ? `<script>const model = (${M.MODEL});\n${GLUE_JS}</script><script>${S.SCHEME_JS}</script><script>${B.BAR_JS}</script><script>${F.FLASH_JS}</script>` : '') : '';
@@ -260,7 +263,7 @@ const MONO = 'ui-monospace, Menlo, Consolas, monospace';
 const SIZE = 'min(1rem, calc((100vw - 32px) / 34))';
 const SURFACE_DARK = [
   ['#vline', 'background: #1a1a1a;'], ['#vsel div', 'background: #700000;'], ['#caret', 'background: #ff0000;'],
-  ['.vim-stat', 'background: #000; color: #fff; border-color: #fff;'], ['.vim-stat #vpos', 'color: #aaa;']];
+  ['.vim-stat', 'background: #000; color: #fff; border-color: #fff;'], ['.vim-stat #vpos', 'color: #aaa;'], ['.vim-side', 'background: #000; color: #fff;']];
 const surfaceDark = (pre) => SURFACE_DARK.map(([s, d]) => `${pre} ${s} { ${d} }`).join('\n  ');
 const schemed = (name, rules) => rules.map(([s, d]) => s.split(', ').map(x => `:root[data-scheme="${name}"] ${x}`).join(', ') + ` { ${d} }`).join('\n  ');
 const SURFACE_CSS = /* css */ `
@@ -283,14 +286,21 @@ const SURFACE_CSS = /* css */ `
   .vim-stat { position: fixed; left: 0; right: 0; bottom: 0; display: flex; justify-content: space-between; gap: 1em; padding: 4px 16px;
     border-top: 1px solid #000; background: #fff; color: #000; font-family: ${MONO}; font-size: 0.85em; line-height: 20px; white-space: pre; overflow: hidden; }
   .vim-stat #vpos { color: #666; flex: none; }
+  .vim-side { position: fixed; inset: 0; z-index: 10; background: #fff; color: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 16px; box-sizing: border-box; }
+  .vim-side[hidden] { display: none; } /* the attribute, over the flex */
+  .vim-side .where { font-size: 0.7em; opacity: 0.6; }
+  .vim-side textarea { width: min(calc(56ch + 34px), 100%); height: min(70vh, 100%); box-sizing: border-box; margin: 0; padding: 8px; border: 1px solid currentColor; border-radius: 0;
+    background: transparent; color: inherit; font: inherit; font-size: 0.8em; letter-spacing: inherit; resize: none; outline: 0; }
   @media (prefers-color-scheme: dark) { ${surfaceDark(':root:not([data-theme="light"])')} }
   ${surfaceDark(':root[data-theme="dark"]')}
   ${schemed('ctrl', [['#vline', `background: ${C.band};`], ['#vsel div', `background: ${C.sel};`], ['#vhl div', `border-bottom: 0; background: ${C.match};`],
     ['#caret, #caret.insert', `background: ${C.caret};`], ['#xh, #xv', `background: ${C.caret}; opacity: 0.5;`],
-    ['.vim-stat', `font-family: ${C.font}; font-size: ${C.size}; letter-spacing: ${C.track}; background: ${C.bg}; color: ${C.stat}; border-color: ${C.rule};`], ['.vim-stat #vpos', `color: ${C.pos};`]])}
+    ['.vim-stat', `font-family: ${C.font}; font-size: ${C.size}; letter-spacing: ${C.track}; background: ${C.bg}; color: ${C.stat}; border-color: ${C.rule};`], ['.vim-stat #vpos', `color: ${C.pos};`],
+    ['.vim-side', `background: ${C.bg}; color: ${C.ink};`], ['.vim-side textarea', `width: min(calc(56ch + 56 * ${C.em} + 34px), 100%); letter-spacing: ${C.em};`]])}
   ${schemed('navy', [['#vline', `background: ${NV.band};`], ['#vsel div', `background: ${NV.sel};`], ['#vhl div', `border-bottom-color: ${NV.match};`], ['#ruler', `border-left-color: ${NV.rule};`],
     ['#caret, #caret.insert', `background: ${NV.caret};`], ['#xh, #xv', `background: ${NV.caret}; opacity: 0.3;`],
-    ['.vim-stat', `font-family: ${NV.font}; font-size: ${NV.size}; letter-spacing: ${NV.track}; background: ${NV.bg}; color: ${NV.ink}; border-color: ${NV.rule};`], ['.vim-stat #vpos', `color: ${NV.pos};`]])}
+    ['.vim-stat', `font-family: ${NV.font}; font-size: ${NV.size}; letter-spacing: ${NV.track}; background: ${NV.bg}; color: ${NV.ink}; border-color: ${NV.rule};`], ['.vim-stat #vpos', `color: ${NV.pos};`],
+    ['.vim-side', `background: ${NV.bg}; color: ${NV.ink};`], ['.vim-side textarea', `width: min(calc(56ch + 56 * ${NV.em} + 34px), 100%); letter-spacing: ${NV.em};`]])}
 `;
 
 // ⌨️ the editor. one string, the buffer; one offset, the cursor; a key
@@ -302,7 +312,7 @@ const VIM_JS = String.raw`(() => {
   // textbox that holds the keyboard, and a status line. the buffer is one
   // string; the cursor an offset into it; lines are found by their starts.
   const wrap = document.getElementById('vwrap'), root = document.getElementById('conscious'),
-    path = root.dataset.path, bside = root.dataset.bside || null, caret = document.getElementById('caret'), selbox = document.getElementById('vsel'), ruler = document.getElementById('ruler'), vline = document.getElementById('vline'), hlbox = document.getElementById('vhl'),
+    path = root.dataset.path, bside = root.dataset.bside || null, side = root.dataset.side || null, caret = document.getElementById('caret'), selbox = document.getElementById('vsel'), ruler = document.getElementById('ruler'), vline = document.getElementById('vline'), hlbox = document.getElementById('vhl'),
     ta = document.getElementById('vin'), left = document.getElementById('vmode'), right = document.getElementById('vpos'), bar = document.querySelector('.vvill-bar');
   const raw = JSON.parse(document.getElementById('text').textContent);
   const eol = raw.endsWith('\n');
@@ -779,7 +789,7 @@ const VIM_JS = String.raw`(() => {
         const m = motion(t, i, { n: c1, op: false }); if (m && m !== 'wait') move(m); return run(keys = t.slice(i + 1)); }
       case 'Z': { if (t[i + 1] === undefined) return 'wait'; if (t[i + 1] === 'Z') ex('x'); else if (t[i + 1] === 'Q') ex('q!'); return true; }
       case '-': case '=': zoomBy((k === '=' ? 1 : -1) * 0.05 * n); return true;
-      case '<BS>': if (bside) { flip(); return true; } break;
+      case '<BS>': if (bside) { if (side === 'b') flip(); else showSide(); return true; } break;
       // Tab and Shift+Tab step the page's structure when the page offers one
       // (the L4's layers): the page names the line n steps on or back, the
       // editor sets the cursor on it, the line in the middle of the view
@@ -866,8 +876,11 @@ const VIM_JS = String.raw`(() => {
   // ⌘↩ in visual mode cuts the selection (to the register too) and
   // appends it to the other side on the server, a block of its own; the
   // cut is in the buffer's undo, the append is done. Backspace in normal
-  // mode goes to the other side's page, writing first if the buffer is
-  // modified (a write refused keeps the page)
+  // mode shows the B side over the page, read fresh from the server, in
+  // a plain textbox (readable, scrollable, copyable; Escape, Backspace or
+  // a click beside it closes it, the keys back to the buffer); on the B
+  // side's own page it goes to the file's, writing first if the buffer
+  // is modified (a write refused keeps the page)
   async function reject(s) {
     const name = bside.split('/').pop(); say('→ ' + name + '…');
     let o; try { const r = await fetch(root.dataset.save, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ path: bside, append: s }) }); o = await r.json(); }
@@ -876,6 +889,23 @@ const VIM_JS = String.raw`(() => {
     say(o.lines + (o.lines === 1 ? ' line → ' : ' lines → ') + name);
   }
   const flip = () => { const go = () => { window.onbeforeunload = null; location.href = location.pathname.replace(/[^/]*$/, bside.split('/').pop()); }; if (modified()) write(go); else go(); };
+  const sideBox = document.getElementById('vside'), sideText = sideBox && sideBox.querySelector('textarea'), sideWhere = sideBox && sideBox.querySelector('.where');
+  const sideOpen = () => !!(sideBox && !sideBox.hidden);
+  async function showSide() {
+    if (!sideBox) return;
+    const name = bside.split('/').pop();
+    sideWhere.textContent = name + ' …'; sideText.value = ''; sideBox.hidden = false; sideText.focus({ preventScroll: true });
+    let t; try { const r = await fetch(bside, { cache: 'no-store' }); if (r.status === 404) t = ''; else if (!r.ok) throw new Error('HTTP ' + r.status); else t = await r.text(); }
+    catch (x) { sideWhere.textContent = name + ': ' + x.message; return; }
+    if (sideBox.hidden) return;
+    sideText.value = t; const n = t.replace(/\n$/, '').split('\n').length;
+    sideWhere.textContent = name + ' · ' + (t.trim() ? n + (n === 1 ? ' line' : ' lines') : 'empty');
+  }
+  const hideSide = () => { if (!sideBox) return; sideBox.hidden = true; ta.focus({ preventScroll: true }); };
+  if (sideBox) {
+    sideText.addEventListener('keydown', (e) => { if (e.key === 'Escape' || e.key === 'Backspace') { e.preventDefault(); hideSide(); } });
+    sideBox.addEventListener('click', (e) => { if (e.target !== sideText) hideSide(); });
+  }
   function ex(c) {
     c = c.trim(); let m;
     if ((m = c.match(/^(%|'<,'>|[\d.$+\-,]*)s([^A-Za-z0-9\s])(.*)$/))) {
@@ -921,6 +951,7 @@ const VIM_JS = String.raw`(() => {
   const busy = () => !!(window.genesis && window.genesis.flash && window.genesis.flash.play);
   ta.addEventListener('keydown', (e) => {
     if (e.isComposing || e.keyCode === 229 || busy()) return;
+    if (sideOpen()) { if (e.key === 'Escape' || e.key === 'Backspace') hideSide(); e.preventDefault(); return; }
     const k = nameOf(e); if (!k) return;
     if (k === '<D-s>') { e.preventDefault(); ex('w'); return; }
     if (k === '<D-CR>') { if (bside && (mode === 'visual' || mode === 'vline')) { e.preventDefault(); feed(k); } return; }
